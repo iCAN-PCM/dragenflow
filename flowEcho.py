@@ -2,6 +2,9 @@ from flow import Flow
 
 
 class constructFlowEcho(Flow):
+    """
+    This will construct bash script to run Echo command
+    """
     def constructor(self, data: dict) -> str:
         command = data.pop("command")
         output = data.pop("file")

@@ -2,6 +2,9 @@ from flow import Flow
 
 
 class constructFlowHead(Flow):
+    """
+    This will construct bash script to run Head command
+    """
     def constructor(self, data: dict) -> str:
         command = data.pop("command")
         input_file = data.pop("file")
