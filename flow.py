@@ -41,13 +41,14 @@ class FlowConstructor:
 
     def execute_flow(self) -> None:
         data = copy.deepcopy(self.data)
-        bash_string = self._flow.constructor(data)
+        bash_strings = self._flow.constructor(data)
         # arg_list = bash_string.split(" ")
-        arg_list = shlex.split(bash_string)
-        output = subprocess.run(arg_list)
-        print("stdout:", output.stdout)
-        print(output)
-        print("--------")
+        for string in bash_strings:
+            arg_list = shlex.split(string)
+            output = subprocess.run(arg_list)
+            print("stdout:", output.stdout)
+            print(output)
+            print("--------")
 
 
 class Flow(ABC):

@@ -8,3 +8,5 @@ cd into the project
 - to execute the bash sctipt using the test case **test.csv**
 `python3 main.py execute_bash ./test.csv`
 
+- dragen command
+` python3 main.py construct_str -path ./test_samplesheet.csv -flow dragen   `
