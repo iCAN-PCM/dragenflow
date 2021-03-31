@@ -3,6 +3,10 @@ import json
 import logging
 from string import Formatter
 
+import logging
+import sys
+
+
 logging.basicConfig(filename="app.log", filemode="w", level=logging.DEBUG)
 logging.info("this is info")
 
@@ -12,16 +16,17 @@ def load_json(file: str = "config.json") -> dict:
         configs = json.load(jf)
     return configs
 
-def get_ref(template:dict,data:dict) -> str:
-    k_ = data['RefGenome']
-    ref = template['def_parameters']['RefGenome'][k_]
-    return ref['ref-dir']
+
+def get_ref(template: dict, excel: dict) -> str:
+    k_ = excel["RefGenome"]
+    ref = template["def_parameters"]["RefGenome"][k_]
+    return ref["ref-dir"]
 
 
-def fastq_file(data: dict, read_n: int) -> str:
-    sample_name = data["Sample_Name"]
-    sample_number = data["index"]
-    lane_number = data.get("Lane")
+def fastq_file(excel: dict, read_n: int) -> str:
+    sample_name = excel["Sample_Name"]
+    sample_number = excel["index"]
+    lane_number = excel.get("Lane")
     if lane_number:
         file_name = (
             f"{sample_name}_S{sample_number}_L00{lane_number}_R{read_n}_001.fastq"
@@ -31,152 +36,181 @@ def fastq_file(data: dict, read_n: int) -> str:
     return file_name
 
 
+def check_key(dct: dict, k: str, val: str) -> str:
+    if k in dct.keys():
+        dct[k] = val
+        return dct
+    else:
+        raise KeyError
+
+
+def normal_pipeline(template: dict, excel: dict, pipeline: str = "normal_pipeline"):
+    try:
+        cmd = template[pipeline]
+        cmd = check_key(cmd, "fastq-file1", fastq_file(excel, 1))
+        cmd = check_key(cmd, "fastq-file2", fastq_file(excel, 2))
+        cmd = check_key(cmd, "qc-coverage-region-1", excel["TargetRegions"])
+        cmd = check_key(cmd, "ref-dir", get_ref(template, excel))
+    except KeyError as e:
+        logging.critical(
+            f"Failed to parse dictionary {excel.get('index')} \n {e}",
+            exc_info=True,
+        )
+        raise
+        exit(1)
+    except:
+        logging.critical(f"Unexpected error: {sys.exc_info()[0]}")
+        raise
+        exit(1)
+    return cmd
+
+
+def tumor_alignment(template: dict, excel: dict, pipeline: str = "tumor_alignment"):
+    try:
+        cmd = template[pipeline]
+        cmd = check_key(cmd, "tumor-fastq1", fastq_file(excel, 1))
+        cmd = check_key(cmd, "tumor-fastq2", fastq_file(excel, 2))
+        cmd = check_key(cmd, "qc-coverage-region-1", excel["TargetRegions"])
+        cmd = check_key(cmd, "ref-dir", get_ref(template, excel))
+    except KeyError as e:
+        logging.critical(
+            f"Failed to parse dictionary {excel.get('index')} \n {e}",
+            exc_info=True,
+        )
+        raise
+        exit(1)
+    except:
+        logging.critical(f"Unexpected error: {sys.exc_info()[0]}")
+        raise
+        exit(1)
+    return cmd
+
+
+def tumor_variant(
+    template: dict, excel: dict, tumor: dict, pipeline: str = "tumor_variant_call"
+):
+    try:
+        cmd = template[pipeline]
+        cmd = check_key(cmd, "tumor-bam-input", f"{tumor['output-file-prefix']}.bam")
+        cmd = check_key(cmd, "ref-dir", get_ref(template, excel))
+    except KeyError as e:
+        logging.critical(
+            f"Failed to parse dictionary {excel.get('index')} \n {e}",
+            exc_info=True,
+        )
+        raise
+        exit(1)
+    except:
+        logging.critical(f"Unexpected error: {sys.exc_info()[0]}")
+        raise
+        exit(1)
+    return cmd
+
+
+def paired_variant(
+    template: dict,
+    excel: dict,
+    normal_bam: str,
+    tumor: dict,
+    pipeline: str = "paired_variant_call",
+):
+    try:
+        cmd = template[pipeline]
+        cmd = check_key(cmd, "bam-input", normal_bam)
+        cmd = check_key(cmd, "tumor-bam-input", f"{tumor['output-file-prefix']}.bam")
+        cmd = check_key(cmd, "ref-dir", get_ref(template, excel))
+    except KeyError as e:
+        logging.critical(
+            f"Failed to parse dictionary {excel.get('index')} \n {e}",
+            exc_info=True,
+        )
+        raise
+        exit(1)
+    except:
+        logging.critical(f"Unexpected error: {sys.exc_info()[0]}")
+        raise
+        exit(1)
+    return cmd
+
+def dragen_cli(cmd:dict) -> str:
+    default_str = " ".join(f"--{key} {val}" for (key, val) in cmd.items())
+    final_str = f"dragen {default_str}"
+    return final_str
+
+
+
 class constructDragen(Flow):
     def __init__(self):
         self.n = 1
         self.current_n = f"N{self.n}"
         self.current_t = f"T{self.n}"
-        self.last_fastq_file = ""
         self.last_bam_file = ""
-        self.args = load_json()["profile1"]
+        self.profile = load_json()["profile1"]
 
-    def constructor(self, data: dict) -> [str]:
+    def constructor(self, excel: dict) -> [str]:
         # "N" (or empty), it triggers normal_pipeline_template
-        print(data.get("tumor/normal"))
-        if data.get("tumor/normal") == "N":
-            logging.info(f"{data.get('tumor/normal')}: executing normal_pipeline")
-
-            # Get defaults
-            default_dict = self.args["normal_pipeline"]
-            try:
-                default_dict["fastq-file1"], default_dict["fastq-file2"] = (
-                    fastq_file(data, 1),
-                    fastq_file(data, 2),
-                )
-            except KeyError as e:
-                logging.error(
-                    f"Failed to infer fastq file at index {data.get('index')}", exc_info=True
-                )
-            # should exist 
-            default_dict["qc-coverage-region-1"] = data["TargetRegions"]
-            default_dict["ref-dir"] = get_ref(self.args,data)
-
-            default_str = " ".join(
-                f"--{key} {val}" for (key, val) in default_dict.items()
-            )
-            final_str = f"dragen {default_str}" 
+        print(excel.get("tumor/normal"))
+        if excel.get("tumor/normal") == "N":
+            logging.info(f"{excel.get('tumor/normal')}: executing normal_pipeline")
+            cmd_d = normal_pipeline(self.profile, excel, "normal_pipeline")
+            final_str = dragen_cli(cmd_d)
 
             return [final_str]
 
-        #  if it's "T" 
-        # run tumor allignment
-        # run tumor variant call
-        if data.get("tumor/normal") == "T":
+        #  if it's "T" 1) run tumor allignment 2) run tumor variant call
+        if excel.get("tumor/normal") == "T":
             logging.info(
-                f"{data.get('tumor/normal')}:preparing tumor alignment template"
+                f"{excel.get('tumor/normal')}:preparing tumor alignment template"
             )
             # Todo:
             # define fastq1 & fastq2
             # define prefix rgid, rgism => rgid is sample id, placeholder idx1_idx2
             # tumor fast fastq1 and 2
             arg_strings = []
-            # print(data)
-            args = load_json()
-            # 1. prepare tumor_alignment template
-            # Get defaults
+            cmd_d1 = tumor_alignment(self.profile, excel, "tumor_alignment")
 
-            default_dict1 = self.args["tumor_alignment"]
-            try:
-                default_dict1["tumor-fastq1"], default_dict1["tumor-fastq2"] = (
-                    fastq_file(data, 1),
-                    fastq_file(data, 2),
-                )
-            except KeyError as e:
-                logging.error(
-                    f"Failed to infer fastq file at index {data.get('index')}", exc_info=True
-                )
-            # should exist
-            default_dict1['qc-coverage-region-1'] = data['TargetRegions']
-            default_dict1["ref-dir"] = get_ref(self.args,data)
-            default_str1 = " ".join(
-                f"--{key} {val}" for (key, val) in default_dict1.items()
-            )
+            default_str1 = " ".join(f"--{key} {val}" for (key, val) in cmd_d1.items())
             final_str1 = f"dragen {default_str1}"
             arg_strings.append(final_str1)
             # 2. prepare tumor_variant_call_template
             # Todo:
             # define tumor bam input => outpufile-prefix.bam (from previous run)
             # get defaults
-            default_dict2 = self.args["tumor_variant_call"]
-            default_dict2["ref-dir"] = get_ref(self.args,data)
-            default_dict2[
-                "tumor-bam-input"
-            ] = f"{default_dict1['output-file-prefix']}.bam"
             logging.info("preparing tumor variant call template")
-            default_str2 = " ".join(
-                f"--{key} {val}" for (key, val) in default_dict1.items()
-            )
-
-            final_str2 = f"dragen {default_str2}"
+            cmd_d2 = tumor_variant(self.profile, excel, cmd_d1, "tumor_variant_call")
+            final_str2 = dragen_cli(cmd_d2)
             arg_strings.append(final_str2)
             return arg_strings
 
-        # if it's N1
-        # run normal pipeline
-        if data.get("tumor/normal") == self.current_n:
+        # if it's N1 1) normal pipeline
+        if excel.get("tumor/normal") == self.current_n:
             # Todo:
             # define prefix
             # define RGID, RGSM
-            default_dict = self.args["normal_pipeline"]
-            default_dict["ref-dir"] = get_ref(self.args,data)
+            cmd_d = normal_pipeline(self.profile, excel, "normal_pipeline")
             logging.info(f"{self.current_n}: preparing normal_pipeline")
-            default_str = " ".join(
-                f"--{key} {val}" for (key, val) in default_dict.items()
-            )
-            final_str = f"dragen {default_str}"
-            self.last_bam_file = f"{default_dict['output-file-prefix']}.bam"
+            final_str = dragen_cli(cmd_d)
+            self.last_bam_file = f"{cmd_d['output-file-prefix']}.bam"
             return [final_str]
 
-        # if it's T1
-        # run tumor alignment
-        # paried
-        if data.get("tumor/normal") == self.current_t:
+        # if it's T1  run tumor alignment & paired variant calls
+        if excel.get("tumor/normal") == self.current_t:
             # Todo:
-            # define prefic
-            # define fastq1 fastq2
+            # define prefix
             # define rgid rgsm
             arg_string = []
-            default_dict1 = self.args["tumor_alignment"]
-            default_dict1["ref-dir"] = get_ref(self.args,data)
             logging.info(f"{self.current_t}: preparing tumor alignment template")
-            try:
-                default_dict1["tumor-fastq1"], default_dict1["tumor-fastq2"] = (
-                    fastq_file(data, 1),
-                    fastq_file(data, 2),
-                )
-            except KeyError as e:
-                logging.error(
-                    f"Failed to infer fastq file at index {data.get('index')}", exc_info=True
-                )
-            # some more code
-            default_str1 = " ".join(
-                f"--{key} {val}" for (key, val) in default_dict1.items()
-            )
-            final_str1 = f"dragen {default_str1}"
+            cmd_d1 = tumor_alignment(self.profile, excel, "tumor_alignment")
+
+            final_str1 = dragen_cli(cmd_d1)
             arg_string.append(final_str1)
             # Todo:
             # define tumor bam input => tumor output prefix.bam
             # define bam-input  =noraml ouput prefix.bam prvious n1 run
-            # define prefix = needs to be dicided
-            default_dict2 = self.args["paired_variant_call"]
-            default_dict2["ref-dir"] = get_ref(self.args,data)
             logging.info(f"{self.current_t}: preparing paired varaint call template")
-            default_dict2['bam-input'] = self.last_bam_file
-            default_dict2['tumor-bam-input'] = f"{default_dict1['output-file-prefix']}.bam"
-            default_str2 = " ".join(
-                f"--{key} {val}" for (key, val) in default_dict2.items()
-            )
-            final_str2 = f"dragen {default_str2}"
+            cmd_d2 = paired_variant(self.profile, excel, self.last_bam_file, cmd_d1)
+
+            final_str2 = dragen_cli(cmd_d2)
             arg_string.append(final_str2)
 
             self.n += 1
