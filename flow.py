@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 
 class FlowConstructor:
     """
-    The FlowConstructor define thes interface necessary to construct various
+    The FlowConstructor define the interface necessary to construct various
     piplines/flow
     """
 
@@ -19,7 +19,7 @@ class FlowConstructor:
     @property
     def flow(self) -> Flow:
         """
-        flow keeps a reference to one of the Flow objects. flow desn't
+        flow keeps a reference to one of the Flow objects. flow doesn't
         know the concrete class of Flow but should work with all Flow through
         flow interface.
         """
@@ -39,29 +39,26 @@ class FlowConstructor:
         result = self._flow.constructor(data)
         return result
 
-    def execute_flow(self) -> None:
+    def execute_flow(self) -> list:
+        """
+        Helper function applicable to all Flow (this is optional)
+        """
+        list_output = []
         data = copy.deepcopy(self.data)
         bash_strings = self._flow.constructor(data)
         # arg_list = bash_string.split(" ")
         for string in bash_strings:
             arg_list = shlex.split(string)
-            output = subprocess.run(arg_list)
-            print("stdout:", output.stdout)
+            output = subprocess.run(
+                arg_list, universal_newlines=True, stdout=subprocess.PIPE
+            )
+            list_output.append(output)
             print(output)
             print("--------")
+        return output
 
 
 class Flow(ABC):
     @abstractmethod
     def constructor(self):
         pass
-
-
-class simpleFlow(Flow):
-    """
-    Simple test implimentation for abstract Flow
-    """
-
-    def constructor(self, data: dict) -> str:
-        arg_string = " ".join(f"{key} {val}" for (key, val) in data.items())
-        return arg_string
