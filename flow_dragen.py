@@ -7,7 +7,7 @@ from utility.dragen_utility import (
     normal_pipeline,
     tumor_alignment,
     tumor_variant,
-    paired_variant
+    paired_variant,
 )
 
 
@@ -71,12 +71,14 @@ class ConstructDragen(Flow):
             # define prefix
             # define rgid rgsm
             arg_string = []
+            # step 1 tumor alignment
             logging.info(f"{self.current_t}: preparing tumor alignment template")
             cmd_d1 = tumor_alignment(self.profile, excel, "tumor_alignment")
 
             final_str1 = dragen_cli(cmd_d1)
             arg_string.append(final_str1)
-           
+
+            # step 2 paired variant call
             logging.info(f"{self.current_t}: preparing paired varaint call template")
             cmd_d2 = paired_variant(self.profile, excel, self.last_bam_file, cmd_d1)
 

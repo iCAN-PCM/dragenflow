@@ -3,7 +3,7 @@ import sys
 import logging
 
 
-def custom_sort(val):
+def custom_sort(val: str) -> int:
 
     if len(str(val)) > 1:
         if val[0] == "N":
@@ -24,6 +24,12 @@ def get_ref(template: dict, excel: dict) -> str:
     k_ = excel["RefGenome"]
     ref = template["def_parameters"]["RefGenome"][k_]
     return ref["ref-dir"]
+
+
+def set_fileprefix(excel: dict) -> str:
+    index = excel["index"]
+    prefix = f"output-prefix_{index}"
+    return prefix
 
 
 def fastq_file(excel: dict, read_n: int) -> str:
@@ -49,11 +55,12 @@ def check_key(dct: dict, k: str, val: str) -> str:
 
 def normal_pipeline(
     template: dict, excel: dict, pipeline: str = "normal_pipeline"
-) -> str:
+) -> dict:
     try:
         cmd = template[pipeline]
         cmd = check_key(cmd, "fastq-file1", fastq_file(excel, 1))
         cmd = check_key(cmd, "fastq-file2", fastq_file(excel, 2))
+        cmd = check_key(cmd, "output-file-prefix", set_fileprefix(excel))
         cmd = check_key(cmd, "qc-coverage-region-1", excel["TargetRegions"])
         cmd = check_key(cmd, "ref-dir", get_ref(template, excel))
     except KeyError as e:
@@ -70,11 +77,14 @@ def normal_pipeline(
     return cmd
 
 
-def tumor_alignment(template: dict, excel: dict, pipeline: str = "tumor_alignment") -> str:
+def tumor_alignment(
+    template: dict, excel: dict, pipeline: str = "tumor_alignment"
+) -> dict:
     try:
         cmd = template[pipeline]
         cmd = check_key(cmd, "tumor-fastq1", fastq_file(excel, 1))
         cmd = check_key(cmd, "tumor-fastq2", fastq_file(excel, 2))
+        cmd = check_key(cmd, "output-file-prefix", set_fileprefix(excel))
         cmd = check_key(cmd, "qc-coverage-region-1", excel["TargetRegions"])
         cmd = check_key(cmd, "ref-dir", get_ref(template, excel))
     except KeyError as e:
@@ -93,10 +103,11 @@ def tumor_alignment(template: dict, excel: dict, pipeline: str = "tumor_alignmen
 
 def tumor_variant(
     template: dict, excel: dict, tumor: dict, pipeline: str = "tumor_variant_call"
-) -> str:
+) -> dict:
     try:
         cmd = template[pipeline]
         cmd = check_key(cmd, "tumor-bam-input", f"{tumor['output-file-prefix']}.bam")
+        cmd = check_key(cmd, "output-file-prefix", set_fileprefix(excel))
         cmd = check_key(cmd, "ref-dir", get_ref(template, excel))
     except KeyError as e:
         logging.critical(
@@ -118,7 +129,7 @@ def paired_variant(
     normal_bam: str,
     tumor: dict,
     pipeline: str = "paired_variant_call",
-) -> str:
+) -> dict:
     try:
         cmd = template[pipeline]
         # tumor bam input => tumor output prefix.bam

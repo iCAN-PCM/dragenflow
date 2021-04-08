@@ -12,7 +12,6 @@
             "soft-read-trimmers": "none",
             "enable-sort": "true",
             "enable-duplicate-marking": "true",
-            "enable-duplicate-marking": "true",
             "enable-sv": "false",
             "sv-exome": "true",
             "enable-cnv": "false",

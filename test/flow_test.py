@@ -1,13 +1,7 @@
-from os.path import dirname, join
-import sys
+import pytest
 
-my_path = dirname(__file__)
-my_path = join(my_path, "../")
-
-sys.path.insert(0, my_path)
 from flow import FlowConstructor, Flow
 from main import HandleFlow
-import pytest
 
 
 class SimpleFlow(Flow):
@@ -58,7 +52,6 @@ def test_echo_flow(flow_context_echo):
     command = context.execute_flow()
     list_command = str(command).split(",")
     stdout = list_command[4]
-    assert str_command == ['ls -l ./test']
+    assert str_command == ["ls -l ./test"]
     assert len(stdout) > 20
-    assert 'conftest.py' in stdout
-
+    assert "conftest.py" in stdout
