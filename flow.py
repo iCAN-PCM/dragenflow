@@ -36,8 +36,8 @@ class FlowConstructor:
         """
 
         data = copy.deepcopy(self.data)
-        result = self._flow.constructor(data)
-        return result
+        constructed_str = self._flow.constructor(data)
+        return constructed_str
 
     def execute_flow(self) -> list:
         """
@@ -55,7 +55,7 @@ class FlowConstructor:
             list_output.append(output)
             print(output)
             print("--------")
-        return output
+        return list_output
 
 
 class Flow(ABC):

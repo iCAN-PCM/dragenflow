@@ -21,7 +21,6 @@
         },
         "tumor_alignment": {
             "ref-dir": "{refgenome}",
-            "intermediate-results-dir": "/staging/intermediate",
             "output-directory": ".",
             "intermediate-results-dir": "{staging}",
             "output-file-prefix": "{outprefix}",
@@ -38,7 +37,6 @@
         },
         "tumor_variant_call": {
             "ref-dir": "{refgenome}",
-            "intermediate-results-dir": "/staging/intermediate",
             "output-directory": ".",
             "intermediate-results-dir": "{staging}",
             "tumor-bam-input": "{tumorbam}",
@@ -50,7 +48,6 @@
         },
         "paired_variant_call": {
             "ref-dir": "{refgenome}",
-            "intermediate-results-dir": "/staging/intermediate",
             "output-directory": ".",
             "intermediate-results-dir": "{staging}",
             "tumor-bam-input": "{tumorbam}",
@@ -62,39 +59,6 @@
             "sv-exome": "true",
             "enable-cnv": "false",
             "vc-enable-joint-detection": "true"
-        },
-        "default": {
-            "ref-dir": "{refgenome}",
-            "intermediate-results-dir": "/staging/intermediate",
-            "staging": "/staging/intermediate",
-            "polyg_trimmers": "--read-trimmers polyg",
-            "soft_read_trimmers": "--soft-read-trimmers none",
-            "sorting": "--enable-sort true",
-            "duplicate_marking": "--enable-duplicate-marking true",
-            "variant_calling": "-enable-variant-caller true",
-            "sv_calling": "--enable-sv false",
-            "sv_exome": "--sv-exome true",
-            "cnv_calling": "--enable-cnv false",
-            "joint_calling": "--vc-enable-joint-detection true",
-            "noiseprofile": "",
-            "qc_coverage": "--qc-coverage-region-1 {TargetRegions} --qc-coverage-reports-1 full_res"
-        },
-        "m_default": {
-            "ref-dir": "{refgenome}",
-            "intermediate-results-dir": "/staging/intermediate",
-            "intermediate-results-dir": "/staging/intermediate",
-            "read-trimers": "polyg",
-            "enable-sort": "true",
-            "enable-duplicate-marking": "true",
-            "enable-variant-caller": "true",
-            "enable-sv": "false",
-            "sv-exome": "true",
-            "enable-cnv": "false",
-            "vc-enable-joint-detection": "true",
-            "qc-coverage-reports-1": "full_res"
-        },
-        "input_default": {
-            "qc-coverage-region-1": "{TargetRegions}"
         },
         "def_parameters": {
             "RefGenome": {
