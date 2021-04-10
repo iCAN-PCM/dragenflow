@@ -1,13 +1,13 @@
-from flow import Flow
 import logging
 
+from flow import Flow
 from utility.dragen_utility import (
     dragen_cli,
     load_json,
     normal_pipeline,
+    paired_variant,
     tumor_alignment,
     tumor_variant,
-    paired_variant,
 )
 
 

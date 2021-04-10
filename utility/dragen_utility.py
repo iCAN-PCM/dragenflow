@@ -65,8 +65,7 @@ def normal_pipeline(
         cmd = check_key(cmd, "ref-dir", get_ref(template, excel))
     except KeyError as e:
         logging.critical(
-            f"Failed to parse dictionary {excel.get('index')} \n {e}",
-            exc_info=True,
+            f"Failed to parse dictionary {excel.get('index')} \n {e}", exc_info=True
         )
         raise
         exit(1)
@@ -89,8 +88,7 @@ def tumor_alignment(
         cmd = check_key(cmd, "ref-dir", get_ref(template, excel))
     except KeyError as e:
         logging.critical(
-            f"Failed to parse dictionary {excel.get('index')} \n {e}",
-            exc_info=True,
+            f"Failed to parse dictionary {excel.get('index')} \n {e}", exc_info=True
         )
         raise
         exit(1)
@@ -111,8 +109,7 @@ def tumor_variant(
         cmd = check_key(cmd, "ref-dir", get_ref(template, excel))
     except KeyError as e:
         logging.critical(
-            f"Failed to parse dictionary {excel.get('index')} \n {e}",
-            exc_info=True,
+            f"Failed to parse dictionary {excel.get('index')} \n {e}", exc_info=True
         )
         raise
         exit(1)
@@ -139,8 +136,7 @@ def paired_variant(
         cmd = check_key(cmd, "ref-dir", get_ref(template, excel))
     except KeyError as e:
         logging.critical(
-            f"Failed to parse dictionary {excel.get('index')} \n {e}",
-            exc_info=True,
+            f"Failed to parse dictionary {excel.get('index')} \n {e}", exc_info=True
         )
         raise
         exit(1)

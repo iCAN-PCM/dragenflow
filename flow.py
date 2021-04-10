@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 import copy
 import shlex
 import subprocess
-from abc import ABC, abstractmethod
 
 
 class FlowConstructor:

@@ -9,7 +9,7 @@ from utility.dragen_utility import custom_sort
 available_flows = {
     # "echo": ConstructFlowEcho(),
     # "head": ConstructFlowHead(),
-    "dragen": ConstructDragen(),
+    "dragen": ConstructDragen()
 }
 
 
