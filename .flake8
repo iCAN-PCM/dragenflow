@@ -4,3 +4,4 @@ select = B,B9,BLK,C,E,F,I,S,W
 ignore = E203,W503
 max-line-length = 88
 import-order-style = google
+per-file-ignores = tests/*:S101
