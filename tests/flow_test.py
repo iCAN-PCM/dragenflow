@@ -1,7 +1,6 @@
 import pytest
 
-from flow import FlowConstructor, Flow
-from main import HandleFlow
+from flow import Flow, FlowConstructor
 
 
 class SimpleFlow(Flow):

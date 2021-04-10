@@ -1,10 +1,10 @@
 import pytest
+
 from utility.dragen_utility import (
     normal_pipeline,
+    paired_variant,
     tumor_alignment,
     tumor_variant,
-    paired_variant,
-    load_json,
 )
 
 
