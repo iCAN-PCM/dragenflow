@@ -61,6 +61,27 @@ def check_key(dct: dict, k: str, val: str) -> str:
         raise KeyError
 
 
+def norm_pip1(template: dict, excel: dict, pipeline: str = "normal_pipeline") -> list:
+    param_list = [i for i in template if str(template[i]).startswith("{")]
+    return param_list
+
+
+# arg_registry = {"fastq-file1", fastq_file(excel, 1),}
+class pipeline:
+    def __init__(self, excel, template):
+        self.ex_dict = excel
+        self.tpl_dict = template
+        self.arg_registry = {
+            "fastq-file1": fastq_file(excel, 1),
+            "fastq-file2": fastq_file(excel, 2),
+            "tumor-fastq1": fastq_file(excel, 1),
+            "tumor-fastq2": fastq_file(excel, 2),
+            "output-file-prefix": set_fileprefix(excel),
+            "qc-coverage-region-1": excel["TargetRegions"],
+            "ref-dir": get_ref(template, excel),
+        }
+
+
 def normal_pipeline(
     template: dict, excel: dict, pipeline: str = "normal_pipeline"
 ) -> dict:
