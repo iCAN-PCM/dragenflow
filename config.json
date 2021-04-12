@@ -22,7 +22,7 @@
         "tumor_alignment": {
             "ref-dir": "{refgenome}",
             "output-directory": ".",
-            "intermediate-results-dir": "{staging}",
+            "intermediate-results-dir": "/staging/intermediate",
             "output-file-prefix": "{outprefix}",
             "tumor-fastq1": "{read1}",
             "tumor-fastq2": "{read2}",
@@ -49,7 +49,7 @@
         "paired_variant_call": {
             "ref-dir": "{refgenome}",
             "output-directory": ".",
-            "intermediate-results-dir": "{staging}",
+            "intermediate-results-dir": "/staging/intermediate",
             "tumor-bam-input": "{tumorbam}",
             "bam-input": "{normalbam}",
             "enable-map-align": "false",

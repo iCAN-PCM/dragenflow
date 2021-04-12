@@ -18,6 +18,8 @@ def template_dict():
             "enable-sv": "false",
             "sv-exome": "true",
             "enable-cnv": "false",
+            "RGID": "{rgid}",
+            "RGSM": "{rgsm}",
             "qc-coverage-region-1": "{TargetRegions}",
             "output-file-prefix": "{outprefix}",
             "fastq-file1": "{read1}",
@@ -26,6 +28,8 @@ def template_dict():
             # tumor alignment specifics
             "tumor-fastq1": "{read1}",
             "tumor-fastq2": "{read2}",
+            "RGID-tumor": "{rgid}",
+            "RGSM-tumor": "{rgsm}",
             # tumor variant call
             "tumor-bam-input": "{tumorbam}",
             # paired variant call
@@ -41,8 +45,9 @@ def excel_dict():
     data = {
         "TargetRegions": "some/path",
         "index": 2,
-        "Sample_Name": "test",
         "RefGenome": "test_genome",
+        "SampleID": "test_sampleid",
+        "Sample_Name": "test_samplename",
     }
     return data
 
@@ -53,8 +58,8 @@ def test_normal_pipeline(template_dict, excel_dict):
     assert type(npl) == dict
     assert npl.get("ref-dir") == "test.m_149"
     assert npl.get("qc-coverage-region-1") == "some/path"
-    assert npl.get("fastq-file1") == "test_S2_R1_001.fastq"
-    assert npl.get("fastq-file2") == "test_S2_R2_001.fastq"
+    assert npl.get("fastq-file1") == "test_samplename_S2_R1_001.fastq"
+    assert npl.get("fastq-file2") == "test_samplename_S2_R2_001.fastq"
 
 
 def test_tumor_alignment(template_dict, excel_dict):
@@ -62,8 +67,8 @@ def test_tumor_alignment(template_dict, excel_dict):
     print(tumor_al)
     assert tumor_al.get("ref-dir") == "test.m_149"
     assert tumor_al.get("qc-coverage-region-1") == "some/path"
-    assert tumor_al.get("tumor-fastq1") == "test_S2_R1_001.fastq"
-    assert tumor_al.get("tumor-fastq2") == "test_S2_R2_001.fastq"
+    assert tumor_al.get("tumor-fastq1") == "test_samplename_S2_R1_001.fastq"
+    assert tumor_al.get("tumor-fastq2") == "test_samplename_S2_R2_001.fastq"
 
 
 def test_tumor_variant(template_dict, excel_dict):

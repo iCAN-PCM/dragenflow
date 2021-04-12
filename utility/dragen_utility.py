@@ -68,6 +68,8 @@ def normal_pipeline(
         cmd = template[pipeline]
         cmd = check_key(cmd, "fastq-file1", fastq_file(excel, 1))
         cmd = check_key(cmd, "fastq-file2", fastq_file(excel, 2))
+        cmd = check_key(cmd, "RGID", set_rgid(excel))
+        cmd = check_key(cmd, "RGSM", set_rgism(excel))
         cmd = check_key(cmd, "output-file-prefix", set_fileprefix(excel))
         cmd = check_key(cmd, "qc-coverage-region-1", excel["TargetRegions"])
         cmd = check_key(cmd, "ref-dir", get_ref(template, excel))
@@ -88,6 +90,8 @@ def tumor_alignment(
         cmd = template[pipeline]
         cmd = check_key(cmd, "tumor-fastq1", fastq_file(excel, 1))
         cmd = check_key(cmd, "tumor-fastq2", fastq_file(excel, 2))
+        cmd = check_key(cmd, "RGID-tumor", set_rgid(excel))
+        cmd = check_key(cmd, "RGSM-tumor", set_rgism(excel))
         cmd = check_key(cmd, "output-file-prefix", set_fileprefix(excel))
         cmd = check_key(cmd, "qc-coverage-region-1", excel["TargetRegions"])
         cmd = check_key(cmd, "ref-dir", get_ref(template, excel))
