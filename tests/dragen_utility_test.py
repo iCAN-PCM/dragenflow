@@ -72,7 +72,7 @@ def test_tumor_variant(template_dict, excel_dict):
     print(tumor_va)
     assert tumor_va.get("tumor-bam-input") == "t-prefix.bam"
     assert tumor_va.get("ref-dir") == "test.m_149"
-    assert tumor_va.get("output-file-prefix") == "output-prefix_2"
+    # assert tumor_va.get("output-file-prefix") == "output-prefix_2"
 
 
 def test_paired_variant(template_dict, excel_dict):

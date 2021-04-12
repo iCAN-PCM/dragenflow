@@ -50,7 +50,10 @@ class FlowConstructor:
         for string in bash_strings:
             arg_list = shlex.split(string)
             output = subprocess.run(
-                arg_list, universal_newlines=True, stdout=subprocess.PIPE
+                arg_list,
+                universal_newlines=True,
+                stdout=subprocess.PIPE,
+                shell=False,
             )
             list_output.append(output)
             print(output)

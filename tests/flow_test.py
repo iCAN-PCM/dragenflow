@@ -35,7 +35,7 @@ def flow_context():
 
 @pytest.fixture
 def flow_context_echo():
-    flow_context_echo = FlowConstructor(ConstructFlowEcho(), {"l": "./test"})
+    flow_context_echo = FlowConstructor(ConstructFlowEcho(), {"l": "./tests"})
     return flow_context_echo
 
 
@@ -51,6 +51,6 @@ def test_echo_flow(flow_context_echo):
     command = context.execute_flow()
     list_command = str(command).split(",")
     stdout = list_command[4]
-    assert str_command == ["ls -l ./test"]
+    assert str_command == ["ls -l ./tests"]
     assert len(stdout) > 20
     assert "conftest.py" in stdout

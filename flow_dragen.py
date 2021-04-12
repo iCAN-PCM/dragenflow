@@ -27,6 +27,10 @@ class ConstructDragen(Flow):
         # "N" (or empty), it triggers normal_pipeline_template
         print(excel.get("tumor/normal"))
         if excel.get("tumor/normal") == "N":
+            # out put prefix = samplename
+            # out put prefix =paired = sample.s
+            # target retion empty = genome
+            # umi profile
             logging.info(f"{excel.get('tumor/normal')}: executing normal_pipeline")
             cmd_d = normal_pipeline(self.profile, excel, "normal_pipeline")
             final_str = dragen_cli(cmd_d)
@@ -39,7 +43,6 @@ class ConstructDragen(Flow):
                 f"{excel.get('tumor/normal')}:preparing tumor alignment template"
             )
             # Todo:
-            # define prefix rgid, rgism => rgid is sample id, placeholder idx1_idx2
             arg_strings = []
             cmd_d1 = tumor_alignment(self.profile, excel, "tumor_alignment")
 
@@ -57,8 +60,7 @@ class ConstructDragen(Flow):
         # if it's N1 1) normal pipeline
         if excel.get("tumor/normal") == self.current_n:
             # Todo:
-            # define prefix
-            # define RGID, RGSM
+
             cmd_d = normal_pipeline(self.profile, excel, "normal_pipeline")
             logging.info(f"{self.current_n}: preparing normal_pipeline")
             final_str = dragen_cli(cmd_d)
@@ -68,8 +70,6 @@ class ConstructDragen(Flow):
         # if it's T1  run tumor alignment & paired variant calls
         if excel.get("tumor/normal") == self.current_t:
             # Todo:
-            # define prefix
-            # define rgid rgsm
             arg_string = []
             # step 1 tumor alignment
             logging.info(f"{self.current_t}: preparing tumor alignment template")

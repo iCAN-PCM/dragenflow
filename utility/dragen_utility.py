@@ -1,5 +1,4 @@
 import json
-import sys
 import logging
 
 
@@ -27,9 +26,18 @@ def get_ref(template: dict, excel: dict) -> str:
 
 
 def set_fileprefix(excel: dict) -> str:
-    index = excel["index"]
-    prefix = f"output-prefix_{index}"
+    prefix = "samplename"
     return prefix
+
+
+def set_rgid(excel: dict) -> str:
+    sample_id = excel["Sample_Name"]
+    return sample_id
+
+
+def set_rgism(excel: dict) -> str:
+    rgism = excel["SampleID"]
+    return rgism
 
 
 def fastq_file(excel: dict, read_n: int) -> str:
@@ -69,10 +77,7 @@ def normal_pipeline(
         )
         raise
         exit(1)
-    except:
-        logging.critical(f"Unexpected error: {sys.exc_info()[0]}")
-        raise
-        exit(1)
+
     return cmd
 
 
@@ -92,10 +97,6 @@ def tumor_alignment(
         )
         raise
         exit(1)
-    except:
-        logging.critical(f"Unexpected error: {sys.exc_info()[0]}")
-        raise
-        exit(1)
     return cmd
 
 
@@ -113,10 +114,7 @@ def tumor_variant(
         )
         raise
         exit(1)
-    except:
-        logging.critical(f"Unexpected error: {sys.exc_info()[0]}")
-        raise
-        exit(1)
+
     return cmd
 
 
@@ -140,10 +138,7 @@ def paired_variant(
         )
         raise
         exit(1)
-    except:
-        logging.critical(f"Unexpected error: {sys.exc_info()[0]}")
-        raise
-        exit(1)
+
     return cmd
 
 
