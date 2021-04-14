@@ -71,15 +71,18 @@ class pipeline:
     def __init__(self, excel, template):
         self.ex_dict = excel
         self.tpl_dict = template
-        self.arg_registry = {
-            "fastq-file1": fastq_file(excel, 1),
-            "fastq-file2": fastq_file(excel, 2),
-            "tumor-fastq1": fastq_file(excel, 1),
-            "tumor-fastq2": fastq_file(excel, 2),
-            "output-file-prefix": set_fileprefix(excel),
-            "qc-coverage-region-1": excel["TargetRegions"],
-            "ref-dir": get_ref(template, excel),
+
+    def get_registry(self):
+        arg_registry = {
+            "fastq-file1": fastq_file(self.ex_dict, 1),
+            "fastq-file2": fastq_file(self.ex_dict, 2),
+            "tumor-fastq1": fastq_file(self.ex_dict, 1),
+            "tumor-fastq2": fastq_file(self.ex_dict, 2),
+            "output-file-prefix": set_fileprefix(self.ex_dict),
+            "qc-coverage-region-1": self.ex_dict["TargetRegions"],
+            "ref-dir": get_ref(self.tpl_dict, self.ex_dict),
         }
+        return arg_registry
 
 
 def normal_pipeline(
