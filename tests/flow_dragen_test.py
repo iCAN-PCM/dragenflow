@@ -9,8 +9,7 @@ def excel_dict():
         "TargetRegions": "some/path",
         "index": 2,
         "RefGenome": "GRCh38",
-        "SampleID": "test_sampleid",
-        "Sample_Name": "test_samplename",
+        "SampleID": "test_sampleID",
     }
     return data
 
@@ -29,6 +28,7 @@ def test_dragen_normal(dragen_flow, excel_dict):
     assert type(dragen_cmd) == list
     assert dragen.n == 1
     assert dragen.current_n == "N1"
+    assert "{" not in str(dragen_cmd[0])
     assert dragen.last_bam_file == ""
 
 
@@ -41,6 +41,7 @@ def test_dragen_tumor(dragen_flow, excel_dict):
     assert len(dragen_cmd) == 2
     assert dragen.n == 1
     assert dragen.current_n == "N1"
+    assert "{" not in str(dragen_cmd[0])
     assert dragen.last_bam_file == ""
 
 
@@ -53,6 +54,7 @@ def test_dragen_normal_tumor1(dragen_flow, excel_dict):
     assert len(dragen_cmd) == 1
     assert dragen.n == 1
     assert dragen.current_n == "N1"
+    assert "{" not in str(dragen_cmd[0])
     # assert dragen.last_bam_file == "output-prefix_2.bam"
 
 
@@ -68,3 +70,7 @@ def test_dragen_normal_tumor2(dragen_flow, excel_dict):
     assert dragen.n == 2
     assert dragen.current_t == "T2"
     assert dragen.last_bam_file == ""
+    assert type(dragen_cmd[0]) == str
+    assert type(dragen_cmd[1]) == str
+    assert "{" not in str(dragen_cmd[0])
+    assert "{" not in str(dragen_cmd[1])

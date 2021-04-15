@@ -1,11 +1,6 @@
 import pytest
 
-from utility.dragen_utility import (
-    normal_pipeline,
-    paired_variant,
-    tumor_alignment,
-    tumor_variant,
-)
+from utility.dragen_utility import custom_sort, get_ref, set_rgism
 
 
 @pytest.fixture
@@ -46,45 +41,22 @@ def excel_dict():
         "TargetRegions": "some/path",
         "index": 2,
         "RefGenome": "test_genome",
-        "SampleID": "test_sampleid",
-        "Sample_Name": "test_samplename",
+        "SampleID": "test_id",
     }
     return data
 
 
-def test_normal_pipeline(template_dict, excel_dict):
-    npl = normal_pipeline(template_dict, excel_dict, "test_pipeline")
-    print(npl)
-    assert type(npl) == dict
-    assert npl.get("ref-dir") == "test.m_149"
-    assert npl.get("qc-coverage-region-1") == "some/path"
-    assert npl.get("fastq-file1") == "test_samplename_S2_R1_001.fastq"
-    assert npl.get("fastq-file2") == "test_samplename_S2_R2_001.fastq"
+
+@pytest.mark.parametrize("test_input,expected", [("", 0), ("N1", 1), ("T4", 4)])
+def test_custom_sort(test_input, expected):
+    assert custom_sort(test_input) == expected
+    assert type(custom_sort(test_input)) == int
 
 
-def test_tumor_alignment(template_dict, excel_dict):
-    tumor_al = tumor_alignment(template_dict, excel_dict, "test_pipeline")
-    print(tumor_al)
-    assert tumor_al.get("ref-dir") == "test.m_149"
-    assert tumor_al.get("qc-coverage-region-1") == "some/path"
-    assert tumor_al.get("tumor-fastq1") == "test_samplename_S2_R1_001.fastq"
-    assert tumor_al.get("tumor-fastq2") == "test_samplename_S2_R2_001.fastq"
+def test_get_ref(excel_dict, template_dict):
+    ref = get_ref(excel_dict, template_dict)
+    ref == "test.m_149"
 
 
-def test_tumor_variant(template_dict, excel_dict):
-    tumor = {"output-file-prefix": "t-prefix"}
-    tumor_va = tumor_variant(template_dict, excel_dict, tumor, "test_pipeline")
-    print(tumor_va)
-    assert tumor_va.get("tumor-bam-input") == "t-prefix.bam"
-    assert tumor_va.get("ref-dir") == "test.m_149"
-    # assert tumor_va.get("output-file-prefix") == "output-prefix_2"
-
-
-def test_paired_variant(template_dict, excel_dict):
-    tumor = {"output-file-prefix": "t-prefix"}
-    tumor_pa = paired_variant(
-        template_dict, excel_dict, "norm.bam", tumor, "test_pipeline"
-    )
-    assert tumor_pa.get("bam-input") == "norm.bam"
-    assert tumor_pa.get("tumor-bam-input") == "t-prefix.bam"
-    assert tumor_pa.get("ref-dir") == "test.m_149"
+def test_set_rgism(excel_dict):
+    assert set_rgism(excel_dict) == excel_dict["SampleID"]

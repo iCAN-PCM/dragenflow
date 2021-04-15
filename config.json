@@ -38,7 +38,7 @@
         "tumor_variant_call": {
             "ref-dir": "{refgenome}",
             "output-directory": ".",
-            "intermediate-results-dir": "{staging}",
+            "intermediate-results-dir": "/staging/intermediate",
             "tumor-bam-input": "{tumorbam}",
             "output-file-prefix": "{outprefix}",
             "enable-map-align": "false",

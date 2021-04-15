@@ -4,10 +4,12 @@ from flow import Flow
 from utility.dragen_utility import (
     dragen_cli,
     load_json,
-    normal_pipeline,
-    paired_variant,
-    tumor_alignment,
-    tumor_variant,
+)
+from utility.pipeline import (
+    BasePipeline,
+    CompositePipeline,
+    PairedVariantPipeline,
+    TumorVariantPipeline,
 )
 
 
@@ -32,7 +34,9 @@ class ConstructDragen(Flow):
             # target retion empty = genome
             # umi profile
             logging.info(f"{excel.get('tumor/normal')}: executing normal_pipeline")
-            cmd_d = normal_pipeline(self.profile, excel, "normal_pipeline")
+            # cmd_d = normal_pipeline(self.profile, excel, "normal_pipeline")
+            cmd_d = BasePipeline(excel, self.profile, "normal_pipeline")
+            cmd_d = cmd_d.construct_pipeline()
             final_str = dragen_cli(cmd_d)
 
             return [final_str]
@@ -44,16 +48,22 @@ class ConstructDragen(Flow):
             )
             # Todo:
             arg_strings = []
-            cmd_d1 = tumor_alignment(self.profile, excel, "tumor_alignment")
-
-            default_str1 = " ".join(f"--{key} {val}" for (key, val) in cmd_d1.items())
-            final_str1 = f"dragen {default_str1}"
+            # cmd_d1 = tumor_alignment(self.profile, excel, "tumor_alignment")
+            cmd_d1 = BasePipeline(excel, self.profile, "tumor_alignment")
+            cmd_d1 = cmd_d1.construct_pipeline()
+            final_str1 = dragen_cli(cmd_d1)
             arg_strings.append(final_str1)
             # 2. prepare tumor_variant_call_template
             # define tumor bam input => outputfile-prefix.bam (from previous run)
             logging.info("preparing tumor variant call template")
-            cmd_d2 = tumor_variant(self.profile, excel, cmd_d1, "tumor_variant_call")
-            final_str2 = dragen_cli(cmd_d2)
+            # cmd_d2 = tumor_variant(self.profile, excel, cmd_d1, "tumor_variant_call")
+            cmd_d2 = CompositePipeline()
+            base_cmd = BasePipeline(excel, self.profile, "tumor_variant_call")
+            tv_cmd = TumorVariantPipeline(tumor=cmd_d1)
+            cmd_d2.add(base_cmd)
+            cmd_d2.add(tv_cmd)
+            # cmd_base =
+            final_str2 = dragen_cli(cmd_d2.construct_pipeline())
             arg_strings.append(final_str2)
             return arg_strings
 
@@ -61,7 +71,8 @@ class ConstructDragen(Flow):
         if excel.get("tumor/normal") == self.current_n:
             # Todo:
 
-            cmd_d = normal_pipeline(self.profile, excel, "normal_pipeline")
+            cmd_d = BasePipeline(excel, self.profile, "normal_pipeline")
+            cmd_d = cmd_d.construct_pipeline()
             logging.info(f"{self.current_n}: preparing normal_pipeline")
             final_str = dragen_cli(cmd_d)
             self.last_bam_file = f"{cmd_d['output-file-prefix']}.bam"
@@ -73,16 +84,21 @@ class ConstructDragen(Flow):
             arg_string = []
             # step 1 tumor alignment
             logging.info(f"{self.current_t}: preparing tumor alignment template")
-            cmd_d1 = tumor_alignment(self.profile, excel, "tumor_alignment")
-
+            # cmd_d1 = tumor_alignment(self.profile, excel, "tumor_alignment")
+            cmd_d1 = BasePipeline(excel, self.profile, "tumor_alignment")
+            cmd_d1 = cmd_d1.construct_pipeline()
             final_str1 = dragen_cli(cmd_d1)
             arg_string.append(final_str1)
 
             # step 2 paired variant call
             logging.info(f"{self.current_t}: preparing paired varaint call template")
-            cmd_d2 = paired_variant(self.profile, excel, self.last_bam_file, cmd_d1)
-
-            final_str2 = dragen_cli(cmd_d2)
+            # cmd_d2 = paired_variant(self.profile, excel, self.last_bam_file, cmd_d1)
+            cmd_d2 = CompositePipeline()
+            base_cmd = BasePipeline(excel, self.profile, "paired_variant_call")
+            pv_cmd = PairedVariantPipeline(self.last_bam_file, cmd_d1)
+            cmd_d2.add(base_cmd)
+            cmd_d2.add(pv_cmd)
+            final_str2 = dragen_cli(cmd_d2.construct_pipeline())
             arg_string.append(final_str2)
 
             self.n += 1
