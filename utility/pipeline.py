@@ -24,7 +24,7 @@ class Pipeline(ABC):
             "tumor-fastq2": fastq_file(self.ex_dict, 2),
             "output-file-prefix": set_fileprefix(self.ex_dict),
             "qc-coverage-region-1": self.ex_dict["TargetRegions"],
-            "ref-dir": get_ref(self.tpl_dict, self.ex_dict),
+            "ref-dir": get_ref(self.ex_dict, self.tpl_dict),
             "RGID": set_rgid(self.ex_dict),
             "RGSM": set_rgism(self.ex_dict),
             "RGID-tumor": set_rgid(self.ex_dict),
@@ -61,16 +61,10 @@ class CompositePipeline(Pipeline):
 
     def construct_pipeline(self) -> dict:
         finale_pipeline = {}
-        # print(len(self._children))
-
         for child in self._children:
             pipe_dict = child.construct_pipeline()
-            print(pipe_dict)
             finale_pipeline.update(pipe_dict)
-            # self.remove(child)
-        print(f"list: {finale_pipeline}")
 
-        # finale_pipeline = {k: v for x in finale_pipeline for k, v in x.items()}
         return finale_pipeline
 
 
@@ -84,6 +78,7 @@ class BasePipeline(Pipeline):
             except KeyError:
                 print(f"missing key {val}: in registry")
                 continue
+        assert type(cmd_dict) == dict
         return cmd_dict
 
 
@@ -95,4 +90,18 @@ class TumorVariantPipeline(Pipeline):
 
         cmd_dict = {"tumor-bam-input": f"{self.tumor['output-file-prefix']}.bam"}
 
+        assert type(cmd_dict) == dict
+        return cmd_dict
+
+
+class PairedVariantPipeline(Pipeline):
+    def __init__(self, normal_bam: str, tumor: dict) -> None:
+        self.tumor = tumor
+        self.normal_bam = normal_bam
+
+    def construct_pipeline(self) -> dict:
+        cmd_dict = {}
+        cmd_dict["bam-input"] = self.normal_bam
+        cmd_dict["tumor-bam-input"] = f"{self.tumor['output-file-prefix']}.bam"
+        assert type(cmd_dict) == dict
         return cmd_dict

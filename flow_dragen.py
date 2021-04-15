@@ -4,9 +4,13 @@ from flow import Flow
 from utility.dragen_utility import (
     dragen_cli,
     load_json,
-    paired_variant,
 )
-from utility.pipeline import BasePipeline, CompositePipeline, TumorVariantPipeline
+from utility.pipeline import (
+    BasePipeline,
+    CompositePipeline,
+    PairedVariantPipeline,
+    TumorVariantPipeline,
+)
 
 
 logging.basicConfig(filename="app.log", filemode="w", level=logging.DEBUG)
@@ -47,8 +51,7 @@ class ConstructDragen(Flow):
             # cmd_d1 = tumor_alignment(self.profile, excel, "tumor_alignment")
             cmd_d1 = BasePipeline(excel, self.profile, "tumor_alignment")
             cmd_d1 = cmd_d1.construct_pipeline()
-            default_str1 = " ".join(f"--{key} {val}" for (key, val) in cmd_d1.items())
-            final_str1 = f"dragen {default_str1}"
+            final_str1 = dragen_cli(cmd_d1)
             arg_strings.append(final_str1)
             # 2. prepare tumor_variant_call_template
             # define tumor bam input => outputfile-prefix.bam (from previous run)
@@ -89,11 +92,13 @@ class ConstructDragen(Flow):
 
             # step 2 paired variant call
             logging.info(f"{self.current_t}: preparing paired varaint call template")
-            cmd_d2 = paired_variant(self.profile, excel, self.last_bam_file, cmd_d1)
-            # cmd_d2 = CompositePipeline()
-            # base_cmd = BasePipeline(excel, self.profile, "t")
-            # tv_cmd = BasePipeline()
-            final_str2 = dragen_cli(cmd_d2)
+            # cmd_d2 = paired_variant(self.profile, excel, self.last_bam_file, cmd_d1)
+            cmd_d2 = CompositePipeline()
+            base_cmd = BasePipeline(excel, self.profile, "paired_variant_call")
+            pv_cmd = PairedVariantPipeline(self.last_bam_file, cmd_d1)
+            cmd_d2.add(base_cmd)
+            cmd_d2.add(pv_cmd)
+            final_str2 = dragen_cli(cmd_d2.construct_pipeline())
             arg_string.append(final_str2)
 
             self.n += 1
