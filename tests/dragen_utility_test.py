@@ -13,6 +13,8 @@ def template_dict():
             "enable-sv": "false",
             "sv-exome": "true",
             "enable-cnv": "false",
+            "RGID": "{rgid}",
+            "RGSM": "{rgsm}",
             "qc-coverage-region-1": "{TargetRegions}",
             "output-file-prefix": "{outprefix}",
             "fastq-file1": "{read1}",
@@ -21,6 +23,8 @@ def template_dict():
             # tumor alignment specifics
             "tumor-fastq1": "{read1}",
             "tumor-fastq2": "{read2}",
+            "RGID-tumor": "{rgid}",
+            "RGSM-tumor": "{rgsm}",
             # tumor variant call
             "tumor-bam-input": "{tumorbam}",
             # paired variant call
@@ -36,11 +40,11 @@ def excel_dict():
     data = {
         "TargetRegions": "some/path",
         "index": 2,
-        "Sample_Name": "test",
         "RefGenome": "test_genome",
         "SampleID": "test_id",
     }
     return data
+
 
 
 @pytest.mark.parametrize("test_input,expected", [("", 0), ("N1", 1), ("T4", 4)])

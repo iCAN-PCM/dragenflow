@@ -8,7 +8,6 @@ def excel_dict():
     data = {
         "TargetRegions": "some/path",
         "index": 2,
-        "Sample_Name": "test",
         "RefGenome": "GRCh38",
         "SampleID": "test_sampleID",
     }
