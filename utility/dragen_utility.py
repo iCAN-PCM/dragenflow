@@ -64,3 +64,8 @@ def dragen_cli(cmd: dict) -> str:
     default_str = " ".join(f"--{key} {val}" for (key, val) in cmd.items())
     final_str = f"dragen {default_str}"
     return final_str
+
+
+def infer_pipeline(pipeline: str) -> str:
+    str_list = pipeline.split("_")
+    return str_list[0]
