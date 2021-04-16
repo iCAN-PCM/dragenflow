@@ -30,7 +30,7 @@ def template_dict():
             # paired variant call
             "bam-input": "{normalbam}",
         },
-        "def_parameters": {"RefGenome": {"test_genome": {"ref-dir": "test.m_149"}}},
+        "ref_parameters": {"RefGenome": {"test_genome": {"ref-dir": "test.m_149"}}},
     }
     return data
 

@@ -24,6 +24,7 @@ class HandleFlow(object):
         """
         if flow == "dragen":
             data_file = pd.read_csv(path, skiprows=4)
+            # path needs to be parsed for flow_cell two step up flow cell
             data_file["tumor/normal"] = data_file["tumor/normal"].fillna(0)
             data_file["sort_order"] = data_file["tumor/normal"].apply(
                 lambda x: custom_sort(x)

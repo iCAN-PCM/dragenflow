@@ -20,7 +20,7 @@ def load_json(file: str = "config.json") -> dict:
 
 def get_ref(excel: dict, template: dict) -> str:
     k_ = excel["RefGenome"]
-    ref = template["def_parameters"]["RefGenome"][k_]
+    ref = template["ref_parameters"]["RefGenome"][k_]
     return ref["ref-dir"]
 
 

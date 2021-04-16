@@ -33,7 +33,7 @@ def template_dict():
             "name": "test_pipeline",
         },
         "test_pipeline2": {"tumor-bam-input": "{tumorbam}", "name": "test_pipeline2"},
-        "def_parameters": {"RefGenome": {"test_genome": {"ref-dir": "test.m_149"}}},
+        "ref_parameters": {"RefGenome": {"test_genome": {"ref-dir": "test.m_149"}}},
     }
     return data
 
@@ -51,9 +51,6 @@ def excel_dict():
 
 
 def test_base_pipeline(excel_dict, template_dict):
-    excel_dict = excel_dict
-    dragen = template_dict
-    # excel_dict["tumor/normal"] = "N"
     dragen_cmd = BasePipeline(excel_dict, template_dict, "test_pipeline")
     dragen = dragen_cmd.construct_pipeline()
     assert dragen["qc-coverage-region-1"] == "some/path"
