@@ -2,9 +2,9 @@ import pytest
 
 from utility.pipeline import (
     BasePipeline,
-    TumorVariantPipeline,
     CompositePipeline,
     PairedVariantPipeline,
+    TumorVariantPipeline,
 )
 
 
@@ -56,8 +56,6 @@ def test_base_pipeline(excel_dict, template_dict):
     # excel_dict["tumor/normal"] = "N"
     dragen_cmd = BasePipeline(excel_dict, template_dict, "test_pipeline")
     dragen = dragen_cmd.construct_pipeline()
-    print(dragen)
-    # assert dragen.n == 1
     assert dragen["qc-coverage-region-1"] == "some/path"
     assert dragen["tumor-fastq2"] == "test_S2_R2_001.fastq"
     assert dragen["ref-dir"] == "test.m_149"

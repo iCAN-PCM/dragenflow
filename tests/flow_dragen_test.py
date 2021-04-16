@@ -10,6 +10,7 @@ def excel_dict():
         "index": 2,
         "RefGenome": "GRCh38",
         "SampleID": "test_sampleID",
+        "Sample_Name": "test_sampleName",
     }
     return data
 

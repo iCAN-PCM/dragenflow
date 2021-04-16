@@ -1,4 +1,5 @@
 import logging
+from typing import List
 
 from flow import Flow
 from utility.dragen_utility import (
@@ -25,7 +26,7 @@ class ConstructDragen(Flow):
         self.last_bam_file = ""
         self.profile = load_json()["profile1"]
 
-    def constructor(self, excel: dict) -> [str]:
+    def constructor(self, excel: dict) -> List[str]:
         # "N" (or empty), it triggers normal_pipeline_template
         print(excel.get("tumor/normal"))
         if excel.get("tumor/normal") == "N":
@@ -42,7 +43,7 @@ class ConstructDragen(Flow):
             return [final_str]
 
         #  if it's "T" 1) run tumor alignment 2) run tumor variant call
-        if excel.get("tumor/normal") == "T":
+        elif excel.get("tumor/normal") == "T":
             logging.info(
                 f"{excel.get('tumor/normal')}:preparing tumor alignment template"
             )
@@ -62,15 +63,12 @@ class ConstructDragen(Flow):
             tv_cmd = TumorVariantPipeline(tumor=cmd_d1)
             cmd_d2.add(base_cmd)
             cmd_d2.add(tv_cmd)
-            # cmd_base =
             final_str2 = dragen_cli(cmd_d2.construct_pipeline())
             arg_strings.append(final_str2)
             return arg_strings
 
         # if it's N1 1) normal pipeline
-        if excel.get("tumor/normal") == self.current_n:
-            # Todo:
-
+        elif excel.get("tumor/normal") == self.current_n:
             cmd_d = BasePipeline(excel, self.profile, "normal_pipeline")
             cmd_d = cmd_d.construct_pipeline()
             logging.info(f"{self.current_n}: preparing normal_pipeline")
@@ -79,7 +77,7 @@ class ConstructDragen(Flow):
             return [final_str]
 
         # if it's T1  run tumor alignment & paired variant calls
-        if excel.get("tumor/normal") == self.current_t:
+        elif excel.get("tumor/normal") == self.current_t:
             # Todo:
             arg_string = []
             # step 1 tumor alignment
@@ -100,7 +98,6 @@ class ConstructDragen(Flow):
             cmd_d2.add(pv_cmd)
             final_str2 = dragen_cli(cmd_d2.construct_pipeline())
             arg_string.append(final_str2)
-
             self.n += 1
             self.current_n = f"N{self.n}"
             self.current_t = f"T{self.n}"
@@ -108,3 +105,9 @@ class ConstructDragen(Flow):
             logging.info(self.current_n)
             logging.info(self.current_t)
             return arg_string
+        else:
+            logging.info("No pipeline info: executing by default normal_pipeline")
+            cmd_d = BasePipeline(excel, self.profile, "normal_pipeline")
+            cmd_d = cmd_d.construct_pipeline()
+            final_str = dragen_cli(cmd_d)
+            return [final_str]

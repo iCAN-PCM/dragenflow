@@ -63,5 +63,5 @@ class FlowConstructor:
 
 class Flow(ABC):
     @abstractmethod
-    def constructor(self):
+    def constructor(self, data: dict):
         pass

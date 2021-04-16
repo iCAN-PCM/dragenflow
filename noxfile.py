@@ -9,7 +9,7 @@ def tests(session):
     """Run tests with pytest"""
     session.install("poetry")
     session.run("poetry", "install", external=True)
-    tests = ["test/"]
+    tests = ["tests/"]
     session.run("pytest", *tests, external=True)
 
 
