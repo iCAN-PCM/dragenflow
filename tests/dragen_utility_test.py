@@ -1,6 +1,6 @@
 import pytest
 
-from utility.dragen_utility import custom_sort, get_ref, set_rgism, infer_pipeline
+from utility.dragen_utility import custom_sort, get_ref, infer_pipeline, set_rgism
 
 
 @pytest.fixture
