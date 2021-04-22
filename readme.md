@@ -1,3 +1,4 @@
+![example workflow](https://github.com/iCAN-PCM/dragenflow/actions/workflows/tests.yml/badge.svg)
 ## Uses
 install dependency from requirements.txt to the virtual environment of your choice. Pipenv is the one that I am working with conda is good too.
 - dragen command
