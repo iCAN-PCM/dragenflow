@@ -24,7 +24,7 @@ class ConstructDragen(Flow):
         self.current_n = f"N{self.n}"
         self.current_t = f"T{self.n}"
         self.last_bam_file = ""
-        self.profile = load_json()["profile1"]
+        self.profile = load_json("config.json")["profile1"]
 
     def constructor(self, excel: dict) -> List[str]:
         # "N" (or empty), it triggers normal_pipeline_template
@@ -36,7 +36,7 @@ class ConstructDragen(Flow):
             # umi profile
             logging.info(f"{excel.get('tumor/normal')}: executing normal_pipeline")
             # cmd_d = normal_pipeline(self.profile, excel, "normal_pipeline")
-            cmd_d = BasePipeline(excel, self.profile, "normal_pipeline")
+            cmd_d = BasePipeline(excel, self.profile, excel.get("pipeline_parameters"))
             cmd_d = cmd_d.construct_pipeline()
             final_str = dragen_cli(cmd_d)
 
@@ -50,7 +50,7 @@ class ConstructDragen(Flow):
             # Todo:
             arg_strings = []
             # cmd_d1 = tumor_alignment(self.profile, excel, "tumor_alignment")
-            cmd_d1 = BasePipeline(excel, self.profile, "tumor_alignment")
+            cmd_d1 = BasePipeline(excel, self.profile, "genome_tumor_alignment")
             cmd_d1 = cmd_d1.construct_pipeline()
             final_str1 = dragen_cli(cmd_d1)
             arg_strings.append(final_str1)
@@ -59,7 +59,7 @@ class ConstructDragen(Flow):
             logging.info("preparing tumor variant call template")
             # cmd_d2 = tumor_variant(self.profile, excel, cmd_d1, "tumor_variant_call")
             cmd_d2 = CompositePipeline()
-            base_cmd = BasePipeline(excel, self.profile, "tumor_variant_call")
+            base_cmd = BasePipeline(excel, self.profile, "genome_tumor_variant_call")
             tv_cmd = TumorVariantPipeline(tumor=cmd_d1)
             cmd_d2.add(base_cmd)
             cmd_d2.add(tv_cmd)
@@ -69,7 +69,7 @@ class ConstructDragen(Flow):
 
         # if it's N1 1) normal pipeline
         elif excel.get("tumor/normal") == self.current_n:
-            cmd_d = BasePipeline(excel, self.profile, "normal_pipeline")
+            cmd_d = BasePipeline(excel, self.profile, "genome_normal_pipeline")
             cmd_d = cmd_d.construct_pipeline()
             logging.info(f"{self.current_n}: preparing normal_pipeline")
             final_str = dragen_cli(cmd_d)
@@ -83,7 +83,7 @@ class ConstructDragen(Flow):
             # step 1 tumor alignment
             logging.info(f"{self.current_t}: preparing tumor alignment template")
             # cmd_d1 = tumor_alignment(self.profile, excel, "tumor_alignment")
-            cmd_d1 = BasePipeline(excel, self.profile, "tumor_alignment")
+            cmd_d1 = BasePipeline(excel, self.profile, "genome_tumor_alignment")
             cmd_d1 = cmd_d1.construct_pipeline()
             final_str1 = dragen_cli(cmd_d1)
             arg_string.append(final_str1)
@@ -92,7 +92,7 @@ class ConstructDragen(Flow):
             logging.info(f"{self.current_t}: preparing paired varaint call template")
             # cmd_d2 = paired_variant(self.profile, excel, self.last_bam_file, cmd_d1)
             cmd_d2 = CompositePipeline()
-            base_cmd = BasePipeline(excel, self.profile, "paired_variant_call")
+            base_cmd = BasePipeline(excel, self.profile, "genome_paired_variant_call")
             pv_cmd = PairedVariantPipeline(self.last_bam_file, cmd_d1)
             cmd_d2.add(base_cmd)
             cmd_d2.add(pv_cmd)
@@ -107,7 +107,7 @@ class ConstructDragen(Flow):
             return arg_string
         else:
             logging.info("No pipeline info: executing by default normal_pipeline")
-            cmd_d = BasePipeline(excel, self.profile, "normal_pipeline")
+            cmd_d = BasePipeline(excel, self.profile, "genome_normal_pipeline")
             cmd_d = cmd_d.construct_pipeline()
             final_str = dragen_cli(cmd_d)
             return [final_str]

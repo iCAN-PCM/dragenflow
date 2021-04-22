@@ -1,6 +1,6 @@
 import pytest
 
-from utility.dragen_utility import custom_sort, get_ref, set_rgism
+from utility.dragen_utility import custom_sort, get_ref, infer_pipeline, set_rgism
 
 
 @pytest.fixture
@@ -30,7 +30,7 @@ def template_dict():
             # paired variant call
             "bam-input": "{normalbam}",
         },
-        "def_parameters": {"RefGenome": {"test_genome": {"ref-dir": "test.m_149"}}},
+        "ref_parameters": {"RefGenome": {"test_genome": {"ref-dir": "test.m_149"}}},
     }
     return data
 
@@ -59,3 +59,17 @@ def test_get_ref(excel_dict, template_dict):
 
 def test_set_rgism(excel_dict):
     assert set_rgism(excel_dict) == excel_dict["SampleID"]
+
+
+@pytest.mark.parametrize(
+    "test_input,expected",
+    [
+        ("genome_normal_pipeline", "genome"),
+        ("exome_paired_variant_call", "exome"),
+        ("exome-umi_normal_pipeline", "exome-umi"),
+        ("ican-exome_paired_variant_call", "ican-exome"),
+        ("ican-exome_umi_tumor_variant_call", "ican-exome"),
+    ],
+)
+def test_infer_pipeline(test_input, expected):
+    assert infer_pipeline(test_input) == expected
