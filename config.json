@@ -127,7 +127,7 @@
             "vc-enable-joint-detection": "true",
             "sv-exome": "true"
         },
-        "exome_umi_normal_pipeline": {
+        "exome-umi_normal_pipeline": {
             "ref-dir": "{refgenome}",
             "intermediate-results-dir": "{staging}",
             "output-directory": ".",
@@ -155,7 +155,7 @@
             "umi-metrics-interval-file": "{umiintervals}",
             "umi-correction-scheme": "random"
         },
-        "exome_umi_tumor_alignment": {
+        "exome-umi_tumor_alignment": {
             "ref-dir": "{refgenome}",
             "intermediate-results-dir": "{staging}",
             "output-directory": ".",
@@ -179,7 +179,7 @@
             "umi-metrics-interval-file": "{umiintervals}",
             "umi-correction-scheme": "random"
         },
-        "exome_umi_tumor_variant_call": {
+        "exome-umi_tumor_variant_call": {
             "ref-dir": "{refgenome}",
             "intermediate-results-dir": "{staging}",
             "output-directory": ".",
@@ -194,7 +194,7 @@
             "sv-exome": "true",
             "qc-coverage-region-1": "{TargetRegions}"
         },
-        "exome_umi_paired_variant_call": {
+        "exome-umi_paired_variant_call": {
             "ref-dir": "{refgenome}",
             "intermediate-results-dir": "{staging}",
             "output-directory": ".",
@@ -210,7 +210,7 @@
             "qc-coverage-region-1": "{TargetRegions}",
             "umiintervals": "{TargetRegions}"
         },
-        "ican_exome_normal_pipeline": {
+        "ican-exome_normal_pipeline": {
             "ref-dir": "{refgenome}",
             "intermediate-results-dir": "{staging}",
             "output-directory": ".",
@@ -231,7 +231,7 @@
             "qc-coverage-reports-1": "full_res",
             "qc-coverage-region-1": "{TargetRegions}"
         },
-        "ican_exome_tumor_alignment": {
+        "ican-exome_tumor_alignment": {
             "ref-dir": "{refgenome}",
             "intermediate-results-dir": "{staging}",
             "output-directory": ".",
@@ -248,7 +248,7 @@
             "qc-coverage-reports-1": "full_res",
             "qc-coverage-region-1": "{TargetRegions}"
         },
-        "ican_exome_tumor_variant_call": {
+        "ican-exome_tumor_variant_call": {
             "ref-dir": "{refgenome}",
             "intermediate-results-dir": "{staging}",
             "output-directory": ".",
@@ -263,7 +263,7 @@
             "vc-systematic-noise": "{noiseprofile}",
             "sv-exome": "true"
         },
-        "ican_exome_paired_variant_call": {
+        "ican-exome_paired_variant_call": {
             "ref-dir": "{refgenome}",
             "intermediate-results-dir": "{staging}",
             "output-directory": ".",
@@ -280,7 +280,7 @@
             "qc-coverage-region-1": "{TargetRegions}",
             "umiintervals": "{TargetRegions}"
         },
-        "ican_exome_umi_normal_pipeline": {
+        "ican-exome-umi_normal_pipeline": {
             "ref-dir": "{refgenome}",
             "intermediate-results-dir": "{staging}",
             "output-directory": ".",
@@ -308,7 +308,7 @@
             "umi-metrics-interval-file": "{umiintervals}",
             "umi-correction-scheme": "random"
         },
-        "ican_exome_umi_tumor_alignment": {
+        "ican-exome-umi_tumor_alignment": {
             "ref-dir": "{refgenome}",
             "intermediate-results-dir": "{staging}",
             "output-directory": ".",
@@ -332,7 +332,7 @@
             "umi-metrics-interval-file": "{umiintervals}",
             "umi-correction-scheme": "random"
         },
-        "ican_exome_umi_tumor_variant_call": {
+        "ican-exome-umi_tumor_variant_call": {
             "ref-dir": "{refgenome}",
             "intermediate-results-dir": "{staging}",
             "output-directory": ".",
@@ -347,7 +347,7 @@
             "vc-systematic-noise": "{noiseprofile}",
             "sv-exome": "true"
         },
-        "ican_exome_umi_paired_variant_call": {
+        "ican-exome-umi_paired_variant_call": {
             "ref-dir": "{refgenome}",
             "intermediate-results-dir": "{staging}",
             "output-directory": ".",

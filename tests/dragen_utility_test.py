@@ -1,6 +1,12 @@
 import pytest
 
-from utility.dragen_utility import custom_sort, get_ref, infer_pipeline, set_rgism
+from utility.dragen_utility import (
+    custom_sort,
+    get_ref,
+    infer_pipeline,
+    set_rgism,
+    load_json,
+)
 
 
 @pytest.fixture
@@ -73,3 +79,8 @@ def test_set_rgism(excel_dict):
 )
 def test_infer_pipeline(test_input, expected):
     assert infer_pipeline(test_input) == expected
+
+
+def test_load_json():
+    json_dict = load_json("config.json")["profile1"]
+    assert type(json_dict["ican-exome_normal_pipeline"]) == dict
