@@ -2,11 +2,11 @@ import pytest
 
 from utility.dragen_utility import (
     custom_sort,
+    get_flow_cell,
     get_ref,
     infer_pipeline,
-    set_rgism,
     load_json,
-    get_flow_cell,
+    set_rgism,
 )
 
 
