@@ -12,6 +12,7 @@ def excel_dict():
         "SampleID": "test_sampleID",
         "Sample_Name": "test_sampleName",
         "pipeline_parameters": "genome",
+        "file_path": "wd/09092_bqweqXX/one/two/test_samplesheet.csv",
     }
     return data
 

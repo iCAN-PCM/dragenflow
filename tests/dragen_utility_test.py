@@ -6,6 +6,7 @@ from utility.dragen_utility import (
     infer_pipeline,
     set_rgism,
     load_json,
+    get_flow_cell,
 )
 
 
@@ -84,3 +85,9 @@ def test_infer_pipeline(test_input, expected):
 def test_load_json():
     json_dict = load_json("config.json")["profile1"]
     assert type(json_dict["ican-exome_normal_pipeline"]) == dict
+
+
+def test_get_flow_cell():
+    path = "./path/210317_A00464_0300_BHW7FTDMXX/one/two/test_samplesheet.csv"
+    flow_cell = get_flow_cell(path)
+    assert flow_cell == "BHW7FTDMXX"

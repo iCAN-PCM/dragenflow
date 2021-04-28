@@ -30,8 +30,9 @@ def set_fileprefix(excel: dict) -> str:
 
 
 def set_rgid(excel: dict) -> str:
-    sample_id = excel["Sample_Name"]
-    return sample_id
+    sample_sheet_path = excel["file_path"]
+    flow_cell_id = get_flow_cell(sample_sheet_path)
+    return flow_cell_id
 
 
 def set_rgism(excel: dict) -> str:
@@ -69,3 +70,10 @@ def dragen_cli(cmd: dict) -> str:
 def infer_pipeline(pipeline: str) -> str:
     str_list = pipeline.split("_")
     return str_list[0]
+
+
+def get_flow_cell(path: str) -> str:
+    split_path = path.split("/")
+    flow_cell = split_path[-4]
+    flow_cell_id = flow_cell.split("_")[-1]
+    return flow_cell_id
