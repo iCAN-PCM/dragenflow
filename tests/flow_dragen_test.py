@@ -11,7 +11,8 @@ def excel_dict():
         "RefGenome": "GRCh38",
         "SampleID": "test_sampleID",
         "Sample_Name": "test_sampleName",
-        "pipeline_parameters": "genome_normal_pipeline",
+        "pipeline_parameters": "genome",
+        "file_path": "wd/09092_bqweqXX/one/two/test_samplesheet.csv",
     }
     return data
 

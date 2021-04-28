@@ -70,7 +70,13 @@ class CompositePipeline(Pipeline):
 
 class BasePipeline(Pipeline):
     def construct_pipeline(self) -> dict:
-        cmd_dict = self.tpl_dict[self.seq_pipeline]
+        try:
+            cmd_dict = self.tpl_dict[self.seq_pipeline]
+        except KeyError as e:
+            print(self.ex_dict)
+            print(self.tpl_dict)
+            raise e
+
         param_list = [i for i in cmd_dict if str(cmd_dict[i]).startswith("{")]
         for val in param_list:
             try:

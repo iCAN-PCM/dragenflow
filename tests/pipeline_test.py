@@ -46,6 +46,7 @@ def excel_dict():
         "Sample_Name": "test",
         "RefGenome": "test_genome",
         "SampleID": "test_sampleID",
+        "file_path": "wd/09092_bqweqXX/one/two/test_samplesheet.csv",
     }
     return data
 

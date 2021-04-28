@@ -42,7 +42,7 @@ class HandleFlow(object):
             data_file = pd.read_csv(path)
         return data_file
 
-    def construct_str(self, path: str, flow: str) -> List[str]:
+    def construct_str(self, path: str, flow: str = "dragen") -> List[str]:
         """
         create appropriate flow object from argument supplied from cli
         & invoke construct_flow method of flow object
