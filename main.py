@@ -1,4 +1,3 @@
-import csv
 import logging
 from typing import List
 
@@ -6,7 +5,7 @@ import fire
 
 from flow import FlowConstructor
 from flow_dragen import ConstructDragen
-from utility.dragen_utility import file_parse
+from utility.dragen_utility import basic_reader, file_parse
 
 # register flows
 available_flows = {
@@ -30,9 +29,10 @@ class HandleFlow(object):
         """
         if flow == "dragen":
             data_file = file_parse(path)
+            return data_file
         else:
-            data_file = csv.DictReader(path)
-        return data_file
+            data_file = basic_reader(path)
+            return data_file
 
     def construct_str(self, path: str, flow: str = "dragen") -> List[str]:
         """

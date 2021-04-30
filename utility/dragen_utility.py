@@ -80,7 +80,15 @@ def get_flow_cell(path: str) -> str:
     return flow_cell_id
 
 
-def file_parse(path: str) -> dict:
+def basic_reader(path: str) -> list:
+
+    with open(path, newline="", encoding="utf-8") as inf:
+        reader = csv.DictReader(inf)
+
+        return list(reader)
+
+
+def file_parse(path: str) -> list:
     with open(path, newline="", encoding="utf-8") as inf:
         reader = csv.reader(inf)
         # find header row
