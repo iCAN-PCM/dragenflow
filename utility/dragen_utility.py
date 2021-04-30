@@ -1,3 +1,4 @@
+import csv
 import json
 
 
@@ -42,7 +43,7 @@ def set_rgism(excel: dict) -> str:
 
 def fastq_file(excel: dict, read_n: int) -> str:
     sample_name = excel["Sample_Name"]
-    sample_number = excel["index"]
+    sample_number = excel["Index"]
     lane_number = excel.get("Lane")
     if lane_number:
         file_name = (
@@ -77,3 +78,35 @@ def get_flow_cell(path: str) -> str:
     flow_cell = split_path[-4]
     flow_cell_id = flow_cell.split("_")[-1]
     return flow_cell_id
+
+
+def basic_reader(path: str) -> list:
+
+    with open(path, newline="", encoding="utf-8") as inf:
+        reader = csv.DictReader(inf)
+
+        return list(reader)
+
+
+def file_parse(path: str) -> list:
+    with open(path, newline="", encoding="utf-8") as inf:
+        reader = csv.reader(inf)
+        # find header row
+        for row in reader:
+            if "" not in row:
+                fieldnames = row
+                break
+        else:
+            # oops, *only* rows with empty cells found
+            raise ValueError("Unable to determine header row")
+
+        # rewind, switch to DictReader, skip past header
+        # inf.seek(0)
+        reader = csv.DictReader(inf, fieldnames)
+        sorted_dict = sorted(
+            reader, key=lambda row: custom_sort(row["tumor/normal"]), reverse=False
+        )
+        for dict_ in sorted_dict:
+            dict_["file_path"] = path
+
+        return sorted_dict

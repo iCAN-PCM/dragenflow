@@ -2,11 +2,10 @@ import logging
 from typing import List
 
 import fire
-import pandas as pd
 
 from flow import FlowConstructor
 from flow_dragen import ConstructDragen
-from utility.dragen_utility import custom_sort
+from utility.dragen_utility import basic_reader, file_parse
 
 # register flows
 available_flows = {
@@ -24,27 +23,16 @@ class HandleFlow(object):
     Interface to flow objects through command line
     """
 
-    def parse_file(self, path: str, flow: str) -> pd.DataFrame:
+    def parse_file(self, path: str, flow: str) -> list:
         """
         parse excel file(sample sheet) and return sorted pandas df
         """
         if flow == "dragen":
-            data_file = pd.read_csv(path, skiprows=4)
-            # path needs to be parsed for flow_cell two step up flow cell
-            # rgid -> flowCell_index-index2
-            data_file["file_path"] = path
-            data_file["tumor/normal"] = data_file["tumor/normal"].fillna(0)
-            data_file["sort_order"] = data_file["tumor/normal"].apply(
-                lambda x: custom_sort(x)
-            )
-            data_file["sort_order"] = data_file["sort_order"].astype(float)
-            data_file = data_file.sort_values(
-                ["sort_order", "tumor/normal"]
-            ).reset_index(drop=True)
-            data_file = data_file.reset_index()
+            data_file = file_parse(path)
+            return data_file
         else:
-            data_file = pd.read_csv(path)
-        return data_file
+            data_file = basic_reader(path)
+            return data_file
 
     def construct_str(self, path: str, flow: str = "dragen") -> List[str]:
         """
@@ -55,9 +43,9 @@ class HandleFlow(object):
         data_file = self.parse_file(path, flow)
         commands = []
 
-        for _, val in data_file.iterrows():
+        for val in data_file:
             if available_flows.get(flow):
-                data = val.to_dict()
+                data = val
                 chosen_flow = available_flows.get(flow)
                 flow_context = FlowConstructor(chosen_flow, data=data)
                 constructed_str = flow_context.construct_flow()
@@ -76,9 +64,9 @@ class HandleFlow(object):
         logging.info("executing bash")
         execution_status = []
         data_file = self.parse_file(path, flow)
-        for _, val in data_file.iterrows():
+        for val in data_file:
             if available_flows.get(flow):
-                data = val.to_dict()
+                data = val
                 chosen_flow = available_flows.get(flow)
                 flow_context = FlowConstructor(chosen_flow, data=data)
                 outputs = flow_context.execute_flow(base_cmd=bash_cmd)

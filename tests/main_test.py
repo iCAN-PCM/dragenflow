@@ -1,4 +1,3 @@
-import pandas as pd
 import pytest
 
 from main import HandleFlow
@@ -10,11 +9,13 @@ def get_handle():
 
 
 def test_parse_file(get_handle):
-    pd_df = get_handle.parse_file(
+    list_dict = get_handle.parse_file(
         "./path/210317_A00464_0300_BHW7FTDMXX/one/two/test_samplesheet.csv", "dragen"
     )
-    assert type(pd_df) == pd.DataFrame
-    assert "file_path" in pd_df.columns
+    assert type(list_dict) == list
+    assert len(list_dict) == 9
+    print(len(list_dict))
+    assert "file_path" in list_dict[0].keys()
 
 
 def test_execute_bash(get_handle):
