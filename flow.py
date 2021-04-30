@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 import copy
+import shlex
 import subprocess
 from typing import List
 
@@ -51,11 +52,19 @@ class FlowConstructor:
         for string in bash_strings:
             # arg_list = shlex.split(string)
             if base_cmd == "echo":
+                arg_list = ["echo", string]
                 output = subprocess.run(
-                    ["echo", string],
+                    arg_list,
                     universal_newlines=True,
                     stdout=subprocess.PIPE,
                     shell=False,
+                )
+            else:
+                arg_list = shlex.split(string)
+                output = subprocess.run(
+                    arg_list,
+                    universal_newlines=True,
+                    stdout=subprocess.PIPE,
                 )
             # list_output.append(output)
             # print(output)
