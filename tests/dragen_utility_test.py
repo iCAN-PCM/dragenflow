@@ -2,6 +2,7 @@ import pytest
 
 from utility.dragen_utility import (
     custom_sort,
+    file_parse,
     get_flow_cell,
     get_ref,
     infer_pipeline,
@@ -53,10 +54,10 @@ def excel_dict():
     return data
 
 
-@pytest.mark.parametrize("test_input,expected", [("", 0), ("N1", 1), ("T4", 4)])
+@pytest.mark.parametrize("test_input,expected", [("", 0), ("N1", 0.5), ("T4", 4)])
 def test_custom_sort(test_input, expected):
     assert custom_sort(test_input) == expected
-    assert type(custom_sort(test_input)) == int
+    assert type(custom_sort(test_input)) == float
 
 
 def test_get_ref(excel_dict, template_dict):
@@ -91,3 +92,12 @@ def test_get_flow_cell():
     path = "./path/210317_A00464_0300_BHW7FTDMXX/one/two/test_samplesheet.csv"
     flow_cell = get_flow_cell(path)
     assert flow_cell == "BHW7FTDMXX"
+
+
+def test_parse_file():
+    path = "./path/210317_A00464_0300_BHW7FTDMXX/one/two/test_samplesheet.csv"
+    data = file_parse(path)
+    assert type(data) == list
+    print(data)
+    assert data[8]["tumor/normal"] == "T3"
+    assert data[0]["tumor/normal"] == "T"

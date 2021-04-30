@@ -2,15 +2,15 @@ import csv
 import json
 
 
-def custom_sort(val: str) -> int:
+def custom_sort(val: str) -> float:
 
     if len(str(val)) > 1:
         if val[0] == "N":
-            return int(val[-1])
+            return float(val[-1]) - 0.5
         if val[0] == "T":
-            return int(val[-1])
+            return float(val[-1])
     else:
-        return 0
+        return 0.0
 
 
 def load_json(file: str = "config.json") -> dict:

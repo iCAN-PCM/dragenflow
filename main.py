@@ -1,7 +1,8 @@
+import argparse
 import logging
 from typing import List
 
-import fire
+# import fire
 
 from flow import FlowConstructor
 from flow_dragen import ConstructDragen
@@ -56,7 +57,9 @@ class HandleFlow(object):
                         print("=========")
         return commands
 
-    def execute_bash(self, path: str, flow: str, bash_cmd: str = "echo") -> list:
+    def execute_bash(
+        self, path: str, flow: str = "dragen", bash_cmd: str = "echo"
+    ) -> list:
         """
         create appropriate flow object from argument supplied from cli
         & invoke execute flow method of flow object
@@ -75,4 +78,20 @@ class HandleFlow(object):
 
 
 if __name__ == "__main__":
-    fire.Fire(HandleFlow)
+    parser = argparse.ArgumentParser(
+        prog="dragenflow", description="Process some integers."
+    )
+    parser.add_argument("--execute", type=str, required=False, nargs=1)
+    parser.add_argument("--flow", type=str, action="store", required=False, nargs=1)
+    parser.add_argument("--dryrun", type=str, required=False, nargs=1)
+    args = parser.parse_args()
+    if args.execute is not None:
+        handle = HandleFlow()
+        handle.execute_bash(path=args.execute[0])
+        print(args.execute)
+    elif args.dryrun is not None:
+        print(args.dryrun)
+        handle = HandleFlow()
+        handle.construct_str(path=args.dryrun[0])
+    else:
+        print("unknown command")
