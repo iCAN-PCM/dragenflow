@@ -42,7 +42,7 @@ def template_dict():
 def excel_dict():
     data = {
         "TargetRegions": "some/path",
-        "index": 2,
+        "Index": 2,
         "Sample_Name": "test",
         "RefGenome": "test_genome",
         "SampleID": "test_sampleID",

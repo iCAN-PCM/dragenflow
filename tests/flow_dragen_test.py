@@ -7,7 +7,7 @@ from flow_dragen import ConstructDragen
 def excel_dict():
     data = {
         "TargetRegions": "some/path",
-        "index": 2,
+        "Index": 2,
         "RefGenome": "GRCh38",
         "SampleID": "test_sampleID",
         "Sample_Name": "test_sampleName",
