@@ -49,8 +49,8 @@ def test_echo_flow(flow_context_echo):
     context = flow_context_echo
     str_command = context.construct_flow()
     command = context.execute_flow()
-    list_command = str(command).split(",")
-    stdout = list_command[4]
+    print(command)
+    stdout = command[0][1]
     assert str_command == ["ls -l ./tests"]
     assert len(stdout) > 20
     assert "conftest.py" in stdout

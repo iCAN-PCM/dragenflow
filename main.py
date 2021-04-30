@@ -1,3 +1,4 @@
+import logging
 from typing import List
 
 import fire
@@ -13,6 +14,9 @@ available_flows = {
     # "head": ConstructFlowHead(),
     "dragen": ConstructDragen()
 }
+
+logging.basicConfig(filename="app.log", filemode="w", level=logging.DEBUG)
+logging.info("started new logging session")
 
 
 class HandleFlow(object):
@@ -47,11 +51,11 @@ class HandleFlow(object):
         create appropriate flow object from argument supplied from cli
         & invoke construct_flow method of flow object
         """
+        logging.info("executing construct str")
         data_file = self.parse_file(path, flow)
         commands = []
 
         for _, val in data_file.iterrows():
-
             if available_flows.get(flow):
                 data = val.to_dict()
                 chosen_flow = available_flows.get(flow)
@@ -64,19 +68,22 @@ class HandleFlow(object):
                         print("=========")
         return commands
 
-    def execute_bash(self, path: str, flow: str) -> None:
+    def execute_bash(self, path: str, flow: str, bash_cmd: str = "echo") -> list:
         """
         create appropriate flow object from argument supplied from cli
         & invoke execute flow method of flow object
         """
+        logging.info("executing bash")
+        execution_status = []
         data_file = self.parse_file(path, flow)
         for _, val in data_file.iterrows():
-            flow = val["pipeline"]
             if available_flows.get(flow):
                 data = val.to_dict()
                 chosen_flow = available_flows.get(flow)
                 flow_context = FlowConstructor(chosen_flow, data=data)
-                flow_context.execute_flow()
+                outputs = flow_context.execute_flow(base_cmd=bash_cmd)
+                execution_status.append(outputs)
+        return execution_status
 
 
 if __name__ == "__main__":

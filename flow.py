@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 import copy
 import shlex
 import subprocess
+from typing import List
 
 
 class FlowConstructor:
@@ -39,25 +40,36 @@ class FlowConstructor:
         constructed_str = self._flow.constructor(data)
         return constructed_str
 
-    def execute_flow(self) -> list:
+    def execute_flow(self, **kwargs) -> List[tuple]:
         """
         Helper function applicable to all Flow (this is optional)
         """
+        base_cmd = kwargs.get("base_cmd")
         list_output = []
         data = copy.deepcopy(self.data)
         bash_strings = self._flow.constructor(data)
         # arg_list = bash_string.split(" ")
         for string in bash_strings:
-            arg_list = shlex.split(string)
-            output = subprocess.run(
-                arg_list,
-                universal_newlines=True,
-                stdout=subprocess.PIPE,
-                shell=False,
-            )
-            list_output.append(output)
-            print(output)
-            print("--------")
+            # arg_list = shlex.split(string)
+            if base_cmd == "echo":
+                arg_list = ["echo", string]
+                output = subprocess.run(
+                    arg_list,
+                    universal_newlines=True,
+                    stdout=subprocess.PIPE,
+                    shell=False,
+                )
+            else:
+                arg_list = shlex.split(string)
+                output = subprocess.run(
+                    arg_list,
+                    universal_newlines=True,
+                    stdout=subprocess.PIPE,
+                )
+            # list_output.append(output)
+            # print(output)
+            # print("--------")
+            list_output.append((output.returncode, output.stdout))
         return list_output
 
 

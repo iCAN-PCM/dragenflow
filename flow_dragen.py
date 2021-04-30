@@ -14,10 +14,6 @@ from utility.pipeline import (
 )
 
 
-logging.basicConfig(filename="app.log", filemode="w", level=logging.DEBUG)
-logging.info("started new logging session")
-
-
 class ConstructDragen(Flow):
     def __init__(self):
         self.n = 1
@@ -29,7 +25,6 @@ class ConstructDragen(Flow):
 
     def constructor(self, excel: dict) -> List[str]:
         # "N" (or empty), it triggers normal_pipeline_template
-        print(excel.get("tumor/normal"))
         pipeline = excel.get("pipeline_parameters")
         if excel.get("tumor/normal") == "N":
             # out put prefix = samplename
