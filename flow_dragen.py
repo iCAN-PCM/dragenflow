@@ -107,7 +107,10 @@ class ConstructDragen(Flow):
             logging.info(self.current_t)
             return arg_string
         else:
-            logging.info("No pipeline info: executing by default normal_pipeline")
+            logging.info(
+                f"{excel.get('tumor/normal')},{self.n}, No pipeline info: \
+                executing by default normal_pipeline"
+            )
             cmd_d = BasePipeline(
                 excel,
                 self.profile,
