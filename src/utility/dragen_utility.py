@@ -1,16 +1,22 @@
 import csv
+import errno
 import json
+import os
+from pathlib import Path
+import shutil
+from typing import List
 
 
 def custom_sort(val: str) -> float:
 
+    rank = 0.0
     if len(str(val)) > 1:
         if val[0] == "N":
-            return float(val[-1]) - 0.5
+            rank = float(val[-1]) - 0.5
         if val[0] == "T":
-            return float(val[-1])
-    else:
-        return 0.0
+            rank = float(val[-1])
+
+    return rank
 
 
 def load_json(file: str = "config.json") -> dict:
@@ -41,20 +47,48 @@ def set_rgism(excel: dict) -> str:
     return rgism
 
 
-def fastq_file(excel: dict, read_n: int) -> str:
+def create_fastq_dir(excel: list) -> list:
+    for row in excel:
+        path = Path(row["file_path"]).absolute()
+        new_path = path.parent / row["SampleID"]
+        new_path.mkdir(exist_ok=True)
+        row["fastq_dir"] = new_path
+    return excel
+
+
+def fastq_file(excel: dict, read_n: int, copy_file: bool = True) -> str:
+
     sample_name = excel["Sample_Name"]
     sample_number = excel["Index"]
     lane_number = excel.get("Lane")
     if lane_number:
         file_name = (
-            f"{sample_name}_S{sample_number}_L00{lane_number}_R{read_n}_001.fastq"
+            f"{sample_name}_S{sample_number}_L00{lane_number}_R{read_n}_001.fastq.gz"
         )
+
     else:
-        file_name = f"{sample_name}_S{sample_number}_R{read_n}_001.fastq"
+        file_name = f"{sample_name}_S{sample_number}_R{read_n}_001.fastq.gz"
+    if copy_file:
+        copy_fast_q(excel, file_name)
     return file_name
 
 
-def check_key(dct: dict, k: str, val: str) -> str:
+def copy_fast_q(excel: dict, fastq_f: str) -> None:
+
+    sample_sheet_path = Path(excel["file_path"]).absolute().parent
+    path_to_fastq = (
+        sample_sheet_path / "demultiplex" / excel["Sample_Project"] / fastq_f
+    )
+    destination_of_fastq = Path(excel["fastq_dir"])
+    if path_to_fastq.exists():
+        shutil.copy(path_to_fastq, destination_of_fastq)
+    else:
+        raise FileNotFoundError(
+            errno.ENOENT, os.strerror(errno.ENOENT), str(path_to_fastq)
+        )
+
+
+def check_key(dct: dict, k: str, val: str) -> dict:
     if k in dct.keys():
         dct[k] = val
         return dct
@@ -62,9 +96,10 @@ def check_key(dct: dict, k: str, val: str) -> str:
         raise KeyError
 
 
-def dragen_cli(cmd: dict) -> str:
+def dragen_cli(cmd: dict, excel: dict) -> str:
     default_str = " ".join(f"--{key} {val}" for (key, val) in cmd.items())
-    final_str = f"dragen {default_str}"
+    final_str = f"grun.py -n dragen-{excel['Sample_Name']} -L logs -q  dragen.q -c  \
+        dragen '{default_str}'"
     return final_str
 
 
@@ -88,7 +123,7 @@ def basic_reader(path: str) -> list:
         return list(reader)
 
 
-def file_parse(path: str) -> list:
+def file_parse(path: str) -> List[dict]:
     with open(path, newline="", encoding="utf-8") as inf:
         reader = csv.reader(inf)
         # find header row

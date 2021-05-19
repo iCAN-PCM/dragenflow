@@ -1,5 +1,5 @@
 [flake8]
-application-import-names=flow,flow_dragen, main, utility
+application_import_names = src,main
 select = B,B9,BLK,C,E,F,I,S,W
 ignore = ANN,E203,W503,S404,S603
 max-line-length = 88

@@ -1,25 +1,28 @@
 import pytest
 
-from flow_dragen import ConstructDragen
+from src.dragen_pipeline import ConstructDragenPipeline
 
 
 @pytest.fixture
 def excel_dict():
     data = {
         "TargetRegions": "some/path",
-        "Index": 2,
+        "Index": "TTGATCCG",
         "RefGenome": "GRCh38",
         "SampleID": "test_sampleID",
-        "Sample_Name": "test_sampleName",
+        "Sample_Name": "testsample1.5",
         "pipeline_parameters": "genome",
-        "file_path": "wd/09092_bqweqXX/one/two/test_samplesheet.csv",
+        "file_path": "./path/210317_A00464_0300_BHW7FTDMXX/test_samplesheet.csv",
+        "Sample_Project": "testproject",
+        "fastq_dir": "./path/210317_A00464_0300_BHW7FTDMXX/testsample",
+        "Lane": 1,
     }
     return data
 
 
 @pytest.fixture
 def dragen_flow():
-    dragen = ConstructDragen()
+    dragen = ConstructDragenPipeline()
     return dragen
 
 
