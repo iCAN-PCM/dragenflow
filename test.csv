@@ -1,3 +1,0 @@
-pipeline,file,number,extra,command
-echo,test.txt,10,bip bip ,echo
-head,main.py,10,bop bop,head
