@@ -366,7 +366,7 @@
         "ref_parameters": {
             "RefGenome": {
                 "GRCh38": {
-                    "ref-dir": "/staging/human/reference/hg38/hg38.fa.k_21.f_16.m_149"
+                    "ref-dir": "/staging/human/reference/hg38/uscs/hg38.fa.k_21.f_16.m_149_cnv"
                 }
             },
             "noiseprofile": "'put noise profile for variant calling here'",

@@ -1,7 +1,8 @@
 import pytest
 
-from utility.dragen_utility import (
+from src.utility.dragen_utility import (
     custom_sort,
+    fastq_file,
     file_parse,
     get_flow_cell,
     get_ref,
@@ -48,8 +49,10 @@ def excel_dict():
     data = {
         "TargetRegions": "some/path",
         "index": 2,
+        "Index": "TTGATCCG",
         "RefGenome": "test_genome",
         "SampleID": "test_id",
+        "Sample_Name": "testsample1.5",
     }
     return data
 
@@ -95,9 +98,14 @@ def test_get_flow_cell():
 
 
 def test_parse_file():
-    path = "./path/210317_A00464_0300_BHW7FTDMXX/one/two/test_samplesheet.csv"
+    path = "./path/210317_A00464_0300_BHW7FTDMXX/test_samplesheet.csv"
     data = file_parse(path)
     assert type(data) == list
     print(data)
     assert data[8]["tumor/normal"] == "T3"
     assert data[0]["tumor/normal"] == "T"
+
+
+def test_fastq_file(excel_dict):
+    fastq_1 = fastq_file(excel_dict, 1, False)
+    assert fastq_1 == "testsample1.5_STTGATCCG_R1_001.fastq.gz"

@@ -37,8 +37,8 @@ class FlowConstructor:
         """
 
         data = copy.deepcopy(self.data)
-        constructed_str = self._flow.constructor(data)
-        return constructed_str
+        constructed = self._flow.constructor(data)
+        return constructed
 
     def execute_flow(self, **kwargs) -> List[tuple]:
         """

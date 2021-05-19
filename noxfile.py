@@ -1,7 +1,7 @@
 import nox
 import tempfile
 
-locations = ["tests", "flow.py", "main.py", "flow_dragen.py"]
+locations = ["tests", "src"]
 
 
 @nox.session(python=["3.8"])

@@ -1,6 +1,6 @@
 import pytest
 
-from flow import Flow, FlowConstructor
+from src.utility.flow import Flow, FlowConstructor
 
 
 class SimpleFlow(Flow):
