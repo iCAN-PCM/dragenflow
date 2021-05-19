@@ -1,5 +1,6 @@
-import nox
 import tempfile
+
+import nox
 
 locations = ["tests", "src"]
 
@@ -41,23 +42,6 @@ def safety(session):
         )
         session.install("safety")
         session.run("safety", "check", f"--file={requirements.name}", "--full-report")
-
-
-# @nox.session
-# def lint(session):
-#     """lint the files"""
-#     session.install("poetry")
-#     session.run("poetry", "install", external=True)
-#     session.run("black", "--check", ".")
-#     session.run("flake8", ".")
-
-
-# @nox.session(python=["3.8"])
-# def typeguard(session):
-#     args = session.posargs or ["-m", "not e2e"]
-#     session.run("poetry", "install", "--no-dev", external=True)
-#     session.install("pytest", "pytest-mock", "typeguard")
-#     session.run("pytest", f"--typeguard-packages={package}", *args)
 
 
 @nox.session(python=["3.8"])
