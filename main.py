@@ -6,12 +6,8 @@ from src.utility.flow import FlowConstructor
 from src.dragen_pipeline import ConstructDragenPipeline
 from src.utility.dragen_utility import basic_reader, create_fastq_dir, file_parse
 
-# register flows
-available_flows = {
-    # "echo": ConstructFlowEcho(),
-    # "head": ConstructFlowHead(),
-    "dragen": ConstructDragenPipeline()
-}
+# register flows/pipeline
+available_pipeline = {"dragen": ConstructDragenPipeline()}
 
 logging.basicConfig(filename="app.log", filemode="w", level=logging.DEBUG)
 logging.info("started new logging session")
@@ -39,7 +35,7 @@ class HandleFlow(object):
     def execute_bash(
         self,
         path: str,
-        flow: str = "dragen",
+        pipeline: str = "dragen",
         bash_cmd: str = "echo",
         dry_run: bool = False,
     ) -> list:
@@ -48,20 +44,18 @@ class HandleFlow(object):
 
         This creates appropriate flow object from argument supplied from cli
         & invoke construct_flow method of flow object
-        create appropriate flow object from argument supplied from cli
-        & invoke execute flow method of flow object
         """
         logging.info("executing bash")
         outputs = []
-        data_file = self.parse_file(path, flow)
+        data_file = self.parse_file(path, pipeline)
         logging.info("creating fastq directory")
         data_file = create_fastq_dir(data_file)
 
         for val in data_file:
-            if available_flows.get(flow):
+            if available_pipeline.get(pipeline):
                 data = val
-                chosen_flow = available_flows.get(flow)
-                flow_context = FlowConstructor(chosen_flow, data=data)
+                chosen_pipeline = available_pipeline.get(pipeline)
+                flow_context = FlowConstructor(chosen_pipeline, data=data)
                 if dry_run is True:
                     constructed_str = flow_context.construct_flow()
                     if constructed_str:

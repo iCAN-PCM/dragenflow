@@ -28,11 +28,8 @@ class ConstructDragenPipeline(Flow):
         pipeline = excel.get("pipeline_parameters")
         if excel.get("tumor/normal") == "N":
             # out put prefix = samplename
-            # out put prefix =paired = sample.s
-            # target retion empty = genome
-            # umi profile
+            # out put prefix paired = sample.s
             logging.info(f"{excel.get('tumor/normal')}: executing normal_pipeline")
-            # cmd_d = normal_pipeline(self.profile, excel, "normal_pipeline")
             cmd_d = BaseDragenCommand(
                 excel, self.profile, f"{pipeline}_normal_pipeline"
             )
@@ -41,24 +38,23 @@ class ConstructDragenPipeline(Flow):
 
             return [final_str]
 
-        #  if it's "T" 1) run tumor alignment 2) run tumor variant call
+        #  if it's "T" => step 1 run tumor alignment
+        #                 step 2 run tumor variant call
         elif excel.get("tumor/normal") == "T":
             logging.info(
                 f"{excel.get('tumor/normal')}:preparing tumor alignment template"
             )
-            # Todo:
             arg_strings = []
-            # cmd_d1 = tumor_alignment(self.profile, excel, "tumor_alignment")
+            # step 1
             cmd_d1 = BaseDragenCommand(
                 excel, self.profile, f"{pipeline}_tumor_alignment"
             )
             cmd_d1 = cmd_d1.construct_commands()
             final_str1 = dragen_cli(cmd_d1, excel)
             arg_strings.append(final_str1)
-            # 2. prepare tumor_variant_call_template
+            # step 2: prepare tumor_variant_call_template
             # define tumor bam input => outputfile-prefix.bam (from previous run)
             logging.info("preparing tumor variant call template")
-            # cmd_d2 = tumor_variant(self.profile, excel, cmd_d1, "tumor_variant_call")
             cmd_d2 = CompositeCommands()
             base_cmd = BaseDragenCommand(
                 excel, self.profile, f"{pipeline}_tumor_variant_call"
@@ -70,7 +66,7 @@ class ConstructDragenPipeline(Flow):
             arg_strings.append(final_str2)
             return arg_strings
 
-        # if it's N1 1) normal pipeline
+        # if it's N1 => step 1 normal pipeline
         elif excel.get("tumor/normal") == self.current_n:
             cmd_d = BaseDragenCommand(
                 excel, self.profile, f"{pipeline}_normal_pipeline"
@@ -81,13 +77,13 @@ class ConstructDragenPipeline(Flow):
             self.last_bam_file = f"{cmd_d['output-file-prefix']}.bam"
             return [final_str]
 
-        # if it's T1  run tumor alignment & paired variant calls
+        # if it's T1 => step 1  run tumor alignment
+        #               step 2 paired variant calls
         elif excel.get("tumor/normal") == self.current_t:
             # Todo:
             arg_string = []
             # step 1 tumor alignment
             logging.info(f"{self.current_t}: preparing tumor alignment template")
-            # cmd_d1 = tumor_alignment(self.profile, excel, "tumor_alignment")
             cmd_d1 = BaseDragenCommand(
                 excel, self.profile, f"{pipeline}_tumor_alignment"
             )
@@ -97,7 +93,6 @@ class ConstructDragenPipeline(Flow):
 
             # step 2 paired variant call
             logging.info(f"{self.current_t}: preparing paired varaint call template")
-            # cmd_d2 = paired_variant(self.profile, excel, self.last_bam_file, cmd_d1)
             cmd_d2 = CompositeCommands()
             base_cmd = BaseDragenCommand(
                 excel, self.profile, f"{pipeline}_paired_variant_call"
