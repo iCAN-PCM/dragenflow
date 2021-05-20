@@ -10,6 +10,7 @@ from .utility.commands import CompositeCommands
 from .utility.dragen_utility import (
     dragen_cli,
     load_json,
+    script_path,
 )
 from .utility.flow import Flow
 
@@ -20,7 +21,7 @@ class ConstructDragenPipeline(Flow):
         self.current_n = f"N{self.n}"
         self.current_t = f"T{self.n}"
         self.last_bam_file = ""
-        self.profile = load_json("config.json")["profile1"]
+        self.profile = load_json(script_path("dragen_config.json"))["profile1"]
         self.current_seq = ""
 
     def constructor(self, excel: dict) -> List[str]:

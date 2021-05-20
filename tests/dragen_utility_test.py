@@ -87,7 +87,7 @@ def test_infer_pipeline(test_input, expected):
 
 
 def test_load_json():
-    json_dict = load_json("config.json")["profile1"]
+    json_dict = load_json("./src/dragen_config.json")["profile1"]
     assert type(json_dict["ican-exome_normal_pipeline"]) == dict
 
 

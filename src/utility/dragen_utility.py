@@ -19,6 +19,19 @@ def custom_sort(val: str) -> float:
     return rank
 
 
+def script_path(filename: str) -> str:
+    """
+    A convenience function to get the absolute path to a file in this
+    This allows the file to be launched from any
+    directory.
+    """
+    import os
+
+    filepath = os.path.join(os.path.dirname(__file__))
+    config_path = os.path.join(filepath, "..")
+    return os.path.join(config_path, filename)
+
+
 def load_json(file: str = "config.json") -> dict:
     with open(file) as jf:
         configs = json.load(jf)
