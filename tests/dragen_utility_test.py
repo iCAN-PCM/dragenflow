@@ -1,6 +1,6 @@
 import pytest
 
-from src.utility.dragen_utility import (
+from dragenflow.src.utility.dragen_utility import (
     custom_sort,
     fastq_file,
     file_parse,
@@ -87,18 +87,20 @@ def test_infer_pipeline(test_input, expected):
 
 
 def test_load_json():
-    json_dict = load_json("./src/dragen_config.json")["profile1"]
+    json_dict = load_json("./dragenflow/src/dragen_config.json")["profile1"]
     assert type(json_dict["ican-exome_normal_pipeline"]) == dict
 
 
 def test_get_flow_cell():
-    path = "./path/210317_A00464_0300_BHW7FTDMXX/one/two/test_samplesheet.csv"
+    path = (
+        "./dragenflow/path/210317_A00464_0300_BHW7FTDMXX/one/two/test_samplesheet.csv"
+    )
     flow_cell = get_flow_cell(path)
     assert flow_cell == "BHW7FTDMXX"
 
 
 def test_parse_file():
-    path = "./path/210317_A00464_0300_BHW7FTDMXX/test_samplesheet.csv"
+    path = "./dragenflow/path/210317_A00464_0300_BHW7FTDMXX/test_samplesheet.csv"
     data = file_parse(path)
     assert type(data) == list
     print(data)

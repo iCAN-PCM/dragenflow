@@ -2,9 +2,13 @@ import argparse
 import logging
 from typing import List
 
-from src.utility.flow import FlowConstructor
-from src.dragen_pipeline import ConstructDragenPipeline
-from src.utility.dragen_utility import basic_reader, create_fastq_dir, file_parse
+from dragenflow.src.dragen_pipeline import ConstructDragenPipeline
+from dragenflow.src.utility.dragen_utility import (
+    basic_reader,
+    create_fastq_dir,
+    file_parse,
+)
+from dragenflow.src.utility.flow import FlowConstructor
 
 # register flows/pipeline
 available_pipeline = {"dragen": ConstructDragenPipeline()}
@@ -69,8 +73,7 @@ class HandleFlow(object):
         return outputs
 
 
-if __name__ == "__main__":
-
+def cli_parser():
     parser = argparse.ArgumentParser(
         prog="dragenflow",
         description="Process given samplesheet and turn into dragen commands.",
@@ -89,3 +92,7 @@ if __name__ == "__main__":
         handle.execute_bash(path=args.path[0], bash_cmd=bash_str, dry_run=args.dryrun)
     else:
         print("unknown command")
+
+
+if __name__ == "__main__":
+    cli_parser()

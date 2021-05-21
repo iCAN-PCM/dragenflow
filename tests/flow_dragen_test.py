@@ -12,9 +12,9 @@ def excel_dict():
         "SampleID": "test_sampleID",
         "Sample_Name": "testsample1.5",
         "pipeline_parameters": "genome",
-        "file_path": "./path/210317_A00464_0300_BHW7FTDMXX/test_samplesheet.csv",
+        "file_path": "./dragenflow/path/210317_A00464_0300_BHW7FTDMXX/test_samplesheet.csv",  # noqa E501
         "Sample_Project": "testproject",
-        "fastq_dir": "./path/210317_A00464_0300_BHW7FTDMXX/testsample",
+        "fastq_dir": "./dragenflow/path/210317_A00464_0300_BHW7FTDMXX/testsample",
         "Lane": 1,
     }
     return data

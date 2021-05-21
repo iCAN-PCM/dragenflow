@@ -1,5 +1,5 @@
 [flake8]
-application_import_names = src,main
+application_import_names = src,main,dragenflow
 select = B,B9,BLK,C,E,F,I,S,W
 ignore = ANN,E203,W503,S404,S603
 max-line-length = 88

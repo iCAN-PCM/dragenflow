@@ -1,12 +1,12 @@
 import pytest
 
-from src.dragen_commands import (
+from dragenflow.src.dragen_commands import (
     BaseDragenCommand,
     PairedVariantCommands,
     TumorVariantCommands,
 )
-from src.utility.commands import CompositeCommands
-from src.utility.dragen_utility import fastq_file
+from dragenflow.src.utility.commands import CompositeCommands
+from dragenflow.src.utility.dragen_utility import fastq_file
 
 
 @pytest.fixture
@@ -33,8 +33,13 @@ def template_dict():
             # "bam-input": "{normalbam}",
             "name": "test_pipeline",
         },
-        "test_pipeline2": {"tumor-bam-input": "{tumorbam}", "name": "test_pipeline2"},
-        "ref_parameters": {"RefGenome": {"test_genome": {"ref-dir": "test.m_149"}}},
+        "test_pipeline2": {
+            "tumor-bam-input": "{tumorbam}",
+            "name": "test_pipeline2",
+        },  # noqa: E731
+        "ref_parameters": {
+            "RefGenome": {"test_genome": {"ref-dir": "test.m_149"}}
+        },  # noqa: E731
     }
     return data
 
@@ -47,9 +52,9 @@ def excel_dict():
         "Sample_Name": "testsample1.5",
         "RefGenome": "test_genome",
         "SampleID": "test_sampleID",
-        "file_path": "./path/210317_A00464_0300_BHW7FTDMXX/test_samplesheet.csv",
+        "file_path": "./dragenflow/path/210317_A00464_0300_BHW7FTDMXX/test_samplesheet.csv",  # noqa E501
         "Sample_Project": "testproject",
-        "fastq_dir": "./path/210317_A00464_0300_BHW7FTDMXX/testsample",
+        "fastq_dir": "./dragenflow/path/210317_A00464_0300_BHW7FTDMXX/testsample",
         "Lane": 1,
     }
     return data
