@@ -1,4 +1,4 @@
-from __future__ import annotations
+# from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from typing import List
@@ -6,11 +6,11 @@ from typing import List
 
 class Commands(ABC):
     @property
-    def parent(self) -> Commands:
+    def parent(self):
         return self._parent
 
     @parent.setter
-    def parent(self, parent: Commands) -> None:
+    def parent(self, parent) -> None:
         self._parent = parent
 
     @abstractmethod

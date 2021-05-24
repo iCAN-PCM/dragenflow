@@ -5,7 +5,7 @@ import nox
 locations = ["tests", "src"]
 
 
-@nox.session(python=["3.8"])
+@nox.session(python=["3.8", "3.6"])
 def tests(session):
     """Run tests with pytest"""
     session.install("poetry")

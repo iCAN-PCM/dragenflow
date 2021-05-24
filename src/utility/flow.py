@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from abc import ABC, abstractmethod
 import copy
 import shlex
@@ -13,12 +11,12 @@ class FlowConstructor:
     piplines/flow
     """
 
-    def __init__(self, flow: Flow, data: dict) -> None:
+    def __init__(self, flow, data: dict) -> None:
         self._flow = flow
         self.data = data
 
     @property
-    def flow(self) -> Flow:
+    def flow(self):
         """
         flow keeps a reference to one of the Flow objects. flow doesn't
         know the concrete class of Flow but should work with all Flow through
@@ -27,7 +25,7 @@ class FlowConstructor:
         return self._flow
 
     @flow.setter
-    def flow(self, flow: Flow) -> None:
+    def flow(self, flow) -> None:
         self._flow = flow
 
     def construct_flow(self) -> str:
