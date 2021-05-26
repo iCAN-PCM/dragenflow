@@ -55,7 +55,7 @@ class HandleFlow(object):
             if available_pipeline.get(pipeline):
                 data = val
                 # skip if pipeline is not dragen
-                if data["pipeline"] != "dragen":
+                if data["pipeline"].lower() != "dragen":
                     continue
                 chosen_pipeline = available_pipeline.get(pipeline)
                 flow_context = FlowConstructor(chosen_pipeline, data=data)
