@@ -16,6 +16,7 @@ def excel_dict():
         "Sample_Project": "testproject",
         "fastq_dir": "./path/210317_A00464_0300_BHW7FTDMXX/testsample",
         "Lane": 1,
+        "dry_run": False,
     }
     return data
 

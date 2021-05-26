@@ -49,11 +49,14 @@ class HandleFlow(object):
         outputs = []
         data_file = self.parse_file(path, pipeline)
         logging.info("creating fastq directory")
-        data_file = create_fastq_dir(data_file)
+        data_file = create_fastq_dir(data_file, dry_run=dry_run)
 
         for val in data_file:
             if available_pipeline.get(pipeline):
                 data = val
+                # skip if pipeline is not dragen
+                if data["pipeline"] != "dragen":
+                    continue
                 chosen_pipeline = available_pipeline.get(pipeline)
                 flow_context = FlowConstructor(chosen_pipeline, data=data)
                 if dry_run is True:
@@ -75,17 +78,14 @@ if __name__ == "__main__":
         prog="dragenflow",
         description="Process given samplesheet and turn into dragen commands.",
     )
-    parser.add_argument("execute", type=str)
-    parser.add_argument("--flow", type=str, action="store", required=False, nargs=1)
-    parser.add_argument("--path", type=str, action="store", required=True, nargs=1)
-    parser.add_argument("--dryrun", default=False, action="store_true")
+    parser.add_argument(
+        "-p", "--path", type=str, action="store", required=True, nargs=1
+    )
+    parser.add_argument("-d", "--dryrun", default=False, action="store_true")
     parser.add_argument("-q", "--queue", default=False, action="store_true")
     args = parser.parse_args()
-    if args.execute is not None:
-        handle = HandleFlow()
-        bash_str = "echo"
-        if args.queue:
-            bash_str = "queue"
-        handle.execute_bash(path=args.path[0], bash_cmd=bash_str, dry_run=args.dryrun)
-    else:
-        print("unknown command")
+    handle = HandleFlow()
+    bash_str = "echo"
+    if args.queue:
+        bash_str = "queue"
+    handle.execute_bash(path=args.path[0], bash_cmd=bash_str, dry_run=args.dryrun)

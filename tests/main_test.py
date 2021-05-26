@@ -13,8 +13,8 @@ def test_parse_file(get_handle):
         "./path/210317_A00464_0300_BHW7FTDMXX/test_samplesheet.csv", "dragen"
     )
     assert type(list_dict) == list
-    assert len(list_dict) == 9
-    print(len(list_dict))
+    # check for number of rows in the excel file its 12 row
+    assert len(list_dict) == 12
     assert "file_path" in list_dict[0].keys()
 
 

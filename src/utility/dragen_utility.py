@@ -56,16 +56,23 @@ def set_rgid(excel: dict) -> str:
 
 
 def set_rgism(excel: dict) -> str:
-    rgism = excel["SampleID"]
+    if excel.get("SampleID"):
+        rgism = excel["SampleID"]
+    elif excel.get("SampleID"):
+        rgism = excel["SampleID"]
+    else:
+        raise KeyError("couldn't find Sample_ID or SampleID col from excel")
     return rgism
 
 
-def create_fastq_dir(excel: list) -> list:
+def create_fastq_dir(excel: list, dry_run: bool = False) -> List[dict]:
     for row in excel:
         path = Path(row["file_path"]).absolute()
         new_path = path.parent / row["SampleID"]
-        new_path.mkdir(exist_ok=True)
+        if not dry_run:
+            new_path.mkdir(exist_ok=True)
         row["fastq_dir"] = new_path
+        row["dry_run"] = dry_run
     return excel
 
 
@@ -93,12 +100,14 @@ def copy_fast_q(excel: dict, fastq_f: str) -> None:
         sample_sheet_path / "demultiplex" / excel["Sample_Project"] / fastq_f
     )
     destination_of_fastq = Path(excel["fastq_dir"])
-    if path_to_fastq.exists():
-        shutil.copy(path_to_fastq, destination_of_fastq)
-    else:
-        raise FileNotFoundError(
-            errno.ENOENT, os.strerror(errno.ENOENT), str(path_to_fastq)
-        )
+    if not excel["dry_run"]:
+        if path_to_fastq.exists():
+            shutil.copy(path_to_fastq, destination_of_fastq)
+        else:
+            print("")
+            raise FileNotFoundError(
+                errno.ENOENT, os.strerror(errno.ENOENT), str(path_to_fastq)
+            )
 
 
 def check_key(dct: dict, k: str, val: str) -> dict:
@@ -136,12 +145,16 @@ def basic_reader(path: str) -> list:
         return list(reader)
 
 
-def file_parse(path: str) -> List[dict]:
+def file_parse(
+    path: str, head_identifier="Lane", sorting_col="tumor/normal"
+) -> List[dict]:
+    # change the variable name
     with open(path, newline="", encoding="utf-8") as inf:
         reader = csv.reader(inf)
         # find header row
         for row in reader:
-            if "" not in row:
+            if row[0].startswith(head_identifier):
+                # if "" not in row:
                 fieldnames = row
                 break
         else:
@@ -152,7 +165,7 @@ def file_parse(path: str) -> List[dict]:
         # inf.seek(0)
         reader = csv.DictReader(inf, fieldnames)
         sorted_dict = sorted(
-            reader, key=lambda row: custom_sort(row["tumor/normal"]), reverse=False
+            reader, key=lambda row: custom_sort(row[sorting_col]), reverse=False
         )
         for dict_ in sorted_dict:
             dict_["file_path"] = path
