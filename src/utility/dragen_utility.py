@@ -58,8 +58,8 @@ def set_rgid(excel: dict) -> str:
 def set_rgism(excel: dict) -> str:
     if excel.get("SampleID"):
         rgism = excel["SampleID"]
-    elif excel.get("SampleID"):
-        rgism = excel["SampleID"]
+    elif excel.get("Sample_ID"):
+        rgism = excel["Sample_ID"]
     else:
         raise KeyError("couldn't find Sample_ID or SampleID col from excel")
     return rgism

@@ -58,6 +58,14 @@ def excel_dict():
     return data
 
 
+@pytest.fixture
+def excel_dict2():
+    data = {
+        "Sample_ID": "test_id",
+    }
+    return data
+
+
 @pytest.mark.parametrize("test_input,expected", [("", 0), ("N1", 0.5), ("T4", 4)])
 def test_custom_sort(test_input, expected):
     assert custom_sort(test_input) == expected
@@ -69,8 +77,9 @@ def test_get_ref(excel_dict, template_dict):
     assert ref == "test.m_149"
 
 
-def test_set_rgism(excel_dict):
+def test_set_rgism(excel_dict, excel_dict2):
     assert set_rgism(excel_dict) == excel_dict["SampleID"]
+    assert set_rgism(excel_dict2) == excel_dict2["Sample_ID"]
 
 
 @pytest.mark.parametrize(
