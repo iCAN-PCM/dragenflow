@@ -53,6 +53,7 @@ def excel_dict():
         "RefGenome": "test_genome",
         "SampleID": "test_id",
         "Sample_Name": "testsample1.5",
+        "dry_run": False,
     }
     return data
 
@@ -101,9 +102,9 @@ def test_parse_file():
     path = "./path/210317_A00464_0300_BHW7FTDMXX/test_samplesheet.csv"
     data = file_parse(path)
     assert type(data) == list
-    print(data)
-    assert data[8]["tumor/normal"] == "T3"
-    assert data[0]["tumor/normal"] == "T"
+    assert len(data) == 12
+    assert data[8]["tumor/normal"] == "N2"
+    assert data[9]["tumor/normal"] == "T2"
 
 
 def test_fastq_file(excel_dict):
