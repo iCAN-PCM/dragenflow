@@ -2,7 +2,7 @@
 Workflow,GenerateFASTQ,,,,,,,,,,,,,,,,,,,,,
 Date,7.10.2020,,,,,,,,,,,,,,,,,,,,,
 [Data],,,,,,,,,,,,,,,,,,,,,,
-Lane,Sample_Project,SampleID,Sample_Name,Index,Index2,Customer,FIMM_Destination,FIMM_batchID,LabRecipe,Operator,RefGenome,TargetRegions,Exp_laneYield,AdapterTrim,pipeline,pipeline_parameters,queue,existing_sample,method,comments,override,tumor/normal
+Lane,Sample_Project,Sample_ID,Sample_Name,Index,Index2,Customer,FIMM_Destination,FIMM_batchID,LabRecipe,Operator,RefGenome,TargetRegions,Exp_laneYield,AdapterTrim,pipeline,pipeline_parameters,queue,existing_sample,method,comments,override,tumor/normal
 1,testproject,testsample,testsample,TTGATCCG1,AAGCTCAC,testclient,/home/local/aekuosma/testfolder,test,,,GRCh38,/fs/vault/pipelines/vcp/target_files/cancer_panel/FIMM_pan_cancer_panel_hg38.gff,5,truseq,,ican-exome,,,,,,
 1,testproject,testsample,testsample,TTGATCCG2,AAGCTCAC,testclient,/home/local/aekuosma/testfolder,test,,,GRCh38,/fs/vault/pipelines/vcp/target_files/cancer_panel/FIMM_pan_cancer_panel_hg38.gff,5,truseq,dragen,ican-exome,,,,,,N1
 1,testproject,testsample1.5,testsample1.5,TTGATCCG3,CGCGTATT,testclient,/home/local/aekuosma/testfolder,test,,,GRCh38,/fs/vault/pipelines/vcp/target_files/cancer_panel/FIMM_pan_cancer_panel_hg38.gff,5,truseq,dragen,ican-exome,,,,,,T1

@@ -68,7 +68,8 @@ def set_rgism(excel: dict) -> str:
 def create_fastq_dir(excel: list, dry_run: bool = False) -> List[dict]:
     for row in excel:
         path = Path(row["file_path"]).absolute()
-        new_path = path.parent / row["SampleID"]
+        sample_id = row["SampleID"] if row.get("SampleID") else row.get("Sample_ID")
+        new_path = path.parent / sample_id
         if not dry_run:
             new_path.mkdir(exist_ok=True)
         row["fastq_dir"] = new_path
