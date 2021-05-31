@@ -25,7 +25,6 @@ def script_path(filename: str) -> str:
     This allows the file to be launched from any
     directory.
     """
-    import os
 
     filepath = os.path.join(os.path.dirname(__file__))
     config_path = os.path.join(filepath, "..")
@@ -45,30 +44,27 @@ def get_ref(excel: dict, template: dict) -> str:
 
 
 def set_fileprefix(excel: dict) -> str:
-    prefix = "samplename"
-    return prefix
+    sample_id = excel["SampleID"] if excel.get("SampleID") else excel["Sample_ID"]
+    return sample_id
 
 
 def set_rgid(excel: dict) -> str:
     sample_sheet_path = excel["file_path"]
     flow_cell_id = get_flow_cell(sample_sheet_path)
-    return flow_cell_id
+    if excel.get("Lane"):
+        flow_cell_id = f"{flow_cell_id}-{excel.get('Lane')}"
+    return f"{flow_cell_id}-{excel['row_index']}"
 
 
 def set_rgism(excel: dict) -> str:
-    if excel.get("SampleID"):
-        rgism = excel["SampleID"]
-    elif excel.get("Sample_ID"):
-        rgism = excel["Sample_ID"]
-    else:
-        raise KeyError("couldn't find Sample_ID or SampleID col from excel")
+    rgism = excel["SampleID"] if excel.get("SampleID") else excel["Sample_ID"]
     return rgism
 
 
 def create_fastq_dir(excel: list, dry_run: bool = False) -> List[dict]:
     for row in excel:
         path = Path(row["file_path"]).absolute()
-        sample_id = row["SampleID"] if row.get("SampleID") else row.get("Sample_ID")
+        sample_id = row["SampleID"] if row.get("SampleID") else row["Sample_ID"]
         new_path = path.parent / sample_id
         if not dry_run:
             new_path.mkdir(exist_ok=True)
@@ -80,7 +76,7 @@ def create_fastq_dir(excel: list, dry_run: bool = False) -> List[dict]:
 def fastq_file(excel: dict, read_n: int, copy_file: bool = True) -> str:
 
     sample_name = excel["Sample_Name"]
-    sample_number = excel["Index"]
+    sample_number = excel["row_index"]
     lane_number = excel.get("Lane")
     if lane_number:
         file_name = (
@@ -132,8 +128,9 @@ def infer_pipeline(pipeline: str) -> str:
 
 
 def get_flow_cell(path: str) -> str:
+    path = os.path.abspath(path)
     split_path = path.split("/")
-    flow_cell = split_path[-4]
+    flow_cell = split_path[-3]
     flow_cell_id = flow_cell.split("_")[-1]
     return flow_cell_id
 
@@ -162,9 +159,15 @@ def file_parse(
             # oops, *only* rows with empty cells found
             raise ValueError("Unable to determine header row")
 
-        # rewind, switch to DictReader, skip past header
-        # inf.seek(0)
+        # if need to rewind, switch to DictReader, skip past header: inf.seek(0)
         reader = csv.DictReader(inf, fieldnames)
+        # Add the index before sorting
+        row_index = 1
+        reader = [val for val in reader]
+        for row in reader:
+            row["row_index"] = row_index
+            row_index += 1
+
         sorted_dict = sorted(
             reader, key=lambda row: custom_sort(row[sorting_col]), reverse=False
         )
