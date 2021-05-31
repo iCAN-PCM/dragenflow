@@ -16,6 +16,7 @@ def test_parse_file(get_handle):
     # check for number of rows in the excel file its 12 row
     assert len(list_dict) == 12
     assert "file_path" in list_dict[0].keys()
+    assert list_dict[1]["row_index"] == 5
 
 
 def test_execute_bash(get_handle):

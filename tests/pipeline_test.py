@@ -52,6 +52,7 @@ def excel_dict():
         "fastq_dir": "./path/210317_A00464_0300_BHW7FTDMXX/testsample",
         "Lane": 1,
         "dry_run": False,
+        "row_index": 2,
     }
     return data
 

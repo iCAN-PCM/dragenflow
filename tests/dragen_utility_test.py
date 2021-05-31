@@ -54,6 +54,7 @@ def excel_dict():
         "SampleID": "test_id",
         "Sample_Name": "testsample1.5",
         "dry_run": False,
+        "row_index": 2,
     }
     return data
 
@@ -104,7 +105,8 @@ def test_load_json():
 def test_get_flow_cell():
     path = "./path/210317_A00464_0300_BHW7FTDMXX/one/two/test_samplesheet.csv"
     flow_cell = get_flow_cell(path)
-    assert flow_cell == "BHW7FTDMXX"
+    # assert flow_cell == "BHW7FTDMXX"
+    assert flow_cell == "one"
 
 
 def test_parse_file():
@@ -118,4 +120,4 @@ def test_parse_file():
 
 def test_fastq_file(excel_dict):
     fastq_1 = fastq_file(excel_dict, 1, False)
-    assert fastq_1 == "testsample1.5_STTGATCCG_R1_001.fastq.gz"
+    assert fastq_1 == "testsample1.5_S2_R1_001.fastq.gz"
