@@ -38,6 +38,20 @@ def test_dragen_normal(dragen_flow, excel_dict):
     assert dragen.current_n == "N1"
     assert "{" not in str(dragen_cmd[0])
     assert dragen.last_bam_file == ""
+    # trimmers shouldn't be here
+    assert "--trim-adapter-read1" not in dragen_cmd[0]
+    assert "--trim-adapter-read2" not in dragen_cmd[0]
+
+
+def test_dragen_normal_with_trim(dragen_flow, excel_dict):
+    excel_dict = excel_dict
+    dragen = dragen_flow
+    excel_dict["tumor/normal"] = "N"
+    excel_dict["AdapterTrim"] = "truseq"
+    dragen_cmd = dragen.constructor(excel_dict)
+    assert "--trim-adapter-read1" in dragen_cmd[0]
+    assert "--trim-adapter-read2" in dragen_cmd[0]
+    assert "--read-trimers" in dragen_cmd[0]
 
 
 def test_dragen_tumor(dragen_flow, excel_dict):

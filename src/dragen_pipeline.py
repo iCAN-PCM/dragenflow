@@ -11,6 +11,7 @@ from .utility.dragen_utility import (
     dragen_cli,
     load_json,
     script_path,
+    trim_options,
 )
 from .utility.flow import Flow
 
@@ -24,6 +25,14 @@ class ConstructDragenPipeline(Flow):
         self.profile = load_json(script_path("dragen_config.json"))["profile1"]
         self.current_seq = ""
 
+    def check_trimming(self, excel: dict, cmd: dict) -> None:
+        trim = trim_options(excel, self.profile)
+        if trim:
+            cmd["read-trimers"] = cmd["read-trimers"] + ",adapter"
+            cmd["trim-adapter-read1"] = trim
+            cmd["trim-adapter-read2"] = trim
+        return
+
     def constructor(self, excel: dict) -> List[str]:
         # "N" (or empty), it triggers normal_pipeline_template
         pipeline = excel.get("pipeline_parameters")
@@ -35,6 +44,7 @@ class ConstructDragenPipeline(Flow):
                 excel, self.profile, f"{pipeline}_normal_pipeline"
             )
             cmd_d = cmd_d.construct_commands()
+            self.check_trimming(excel, cmd_d)
             final_str = dragen_cli(cmd_d, excel)
 
             return [final_str]
@@ -51,6 +61,7 @@ class ConstructDragenPipeline(Flow):
                 excel, self.profile, f"{pipeline}_tumor_alignment"
             )
             cmd_d1 = cmd_d1.construct_commands()
+            self.check_trimming(excel, cmd_d1)
             final_str1 = dragen_cli(cmd_d1, excel)
             arg_strings.append(final_str1)
             # step 2: prepare tumor_variant_call_template
