@@ -118,7 +118,7 @@ def check_key(dct: dict, k: str, val: str) -> dict:
 def dragen_cli(cmd: dict, excel: dict) -> str:
     default_str = " ".join(f"--{key} {val}" for (key, val) in cmd.items())
     final_str = f"grun.py -n dragen-{excel['Sample_Name']} -L logs -q  dragen.q -c  \
-        dragen '{default_str}'"
+        'dragen {default_str}'"
     return final_str
 
 
@@ -175,3 +175,18 @@ def file_parse(
             dict_["file_path"] = path
 
         return sorted_dict
+
+
+def trim_options(excel: dict, template: dict) -> str:
+    # check if adaptertrim exist in sample sheet
+    if excel.get("AdapterTrim"):
+        if excel["AdapterTrim"] == "truseq":
+            return template["adapters"][excel["AdapterTrim"]]
+        elif excel["AdapterTrim"].startswith("/"):
+            return excel["AdapterTrim"]
+        else:
+            raise ValueError(
+                f"Cannot retrieve adapters for value: {excel['AdapterTrim']}"
+            )
+    else:
+        return ""

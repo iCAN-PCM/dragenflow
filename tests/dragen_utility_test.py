@@ -9,6 +9,7 @@ from src.utility.dragen_utility import (
     infer_pipeline,
     load_json,
     set_rgism,
+    trim_options,
 )
 
 
@@ -38,6 +39,9 @@ def template_dict():
             "tumor-bam-input": "{tumorbam}",
             # paired variant call
             "bam-input": "{normalbam}",
+        },
+        "adapters": {
+            "truseq": "/fas/NGS/pipes/dragen/configs/adapters/truseq_adapters.fasta"
         },
         "ref_parameters": {"RefGenome": {"test_genome": {"ref-dir": "test.m_149"}}},
     }
@@ -121,3 +125,12 @@ def test_parse_file():
 def test_fastq_file(excel_dict):
     fastq_1 = fastq_file(excel_dict, 1, False)
     assert fastq_1 == "testsample1.5_S2_R1_001.fastq.gz"
+
+
+def test_trim_options(excel_dict, template_dict):
+    # trigger trim option
+    excel_dict = excel_dict
+    excel_dict["AdapterTrim"] = "truseq"
+    adapter = trim_options(excel_dict, template_dict)
+
+    assert adapter == template_dict["adapters"]["truseq"]

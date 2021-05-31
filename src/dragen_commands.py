@@ -29,6 +29,7 @@ class BaseDragenCommand(Commands):
             "RGSM": set_rgism(self.excel),
             "RGID-tumor": set_rgid(self.excel),
             "RGSM-tumor": set_rgism(self.excel),
+            # depending on the use case this can be directly added to json-template file
             "intermediate-results-dir": "/staging/intermediate",
         }
 
