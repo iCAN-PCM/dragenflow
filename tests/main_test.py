@@ -20,13 +20,13 @@ def test_parse_file(get_handle):
 
 
 def test_execute_bash(get_handle):
-    get_handle1 = get_handle
-    list_str = get_handle1.execute_bash(
-        "./path/210317_A00464_0300_BHW7FTDMXX/test_samplesheet.csv", "dragen"
+    list_str = get_handle.execute_bash(
+        "./path/210317_A00464_0300_BHW7FTDMXX/test_samplesheet.csv",
+        "dragen",
+        dry_run=False,
     )
-
-    assert sum([len(elem) for elem in list_str]) == 13
-
+    print(f"len of : {len(list_str)}")
+    assert len(list_str) == 13
     for val in list_str:
         if type(val[0]) == int:
             assert val[0] == 0
@@ -40,6 +40,10 @@ def test_construct_str(get_handle):
         "dragen",
         dry_run=True,
     )
+    with open("test1.txt", "w") as f:
+        for val in list_str:
+            f.write(f"{val} \n")
+    assert len(list_str) == 13
     for val in list_str:
         assert type(val) == str
         assert "{" not in val

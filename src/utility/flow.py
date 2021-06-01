@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-import copy
 import shlex
 import subprocess
 from typing import List
@@ -11,9 +10,8 @@ class FlowConstructor:
     piplines/flow
     """
 
-    def __init__(self, flow, data: dict) -> None:
+    def __init__(self, flow) -> None:
         self._flow = flow
-        self.data = data
 
     @property
     def flow(self):
@@ -28,27 +26,24 @@ class FlowConstructor:
     def flow(self, flow) -> None:
         self._flow = flow
 
-    def construct_flow(self) -> str:
+    def construct_flow(self, data: dict) -> List[str]:
         """
         FlowConstructor delegates main task to the Flow object instead of
         implementing multiple version of the task on its own.
         """
 
-        data = copy.deepcopy(self.data)
         constructed = self._flow.constructor(data)
         return constructed
 
-    def execute_flow(self, **kwargs) -> List[tuple]:
+    @staticmethod
+    def execute_flow(**kwargs) -> List[tuple]:
         """
         Helper function applicable to all Flow (this is optional)
         """
         base_cmd = kwargs.get("base_cmd")
+        command_list = kwargs.get("cmd_list")
         list_output = []
-        data = copy.deepcopy(self.data)
-        bash_strings = self._flow.constructor(data)
-        # arg_list = bash_string.split(" ")
-        for string in bash_strings:
-            # arg_list = shlex.split(string)
+        for string in command_list:
             if base_cmd == "echo":
                 arg_list = ["echo", string]
                 output = subprocess.run(
@@ -64,9 +59,6 @@ class FlowConstructor:
                     universal_newlines=True,
                     stdout=subprocess.PIPE,
                 )
-            # list_output.append(output)
-            # print(output)
-            # print("--------")
             list_output.append((output.returncode, output.stdout))
         return list_output
 

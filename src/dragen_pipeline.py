@@ -33,6 +33,12 @@ class ConstructDragenPipeline(Flow):
             cmd["trim-adapter-read2"] = trim
         return
 
+    def reset(self):
+        self.n = 1
+        self.current_n = f"N{self.n}"
+        self.current_t = f"T{self.n}"
+        self.last_bam_file = ""
+
     def constructor(self, excel: dict) -> List[str]:
         # "N" (or empty), it triggers normal_pipeline_template
         pipeline = excel.get("pipeline_parameters")

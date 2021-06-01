@@ -27,28 +27,27 @@ class ConstructFlowEcho(Flow):
 
 @pytest.fixture
 def flow_context():
-    flow_context = FlowConstructor(
-        SimpleFlow(), {"command": "echo", "output": "test.txt"}
-    )
+    flow_context = FlowConstructor(SimpleFlow())
     return flow_context
 
 
 @pytest.fixture
 def flow_context_echo():
-    flow_context_echo = FlowConstructor(ConstructFlowEcho(), {"l": "./tests"})
+    flow_context_echo = FlowConstructor(ConstructFlowEcho())
     return flow_context_echo
 
 
 def test_simple_flow(flow_context):
     context = flow_context
-    command = context.construct_flow()
+    command = context.construct_flow({"command": "echo", "output": "test.txt"})
     assert command == "command echo output test.txt"
 
 
 def test_echo_flow(flow_context_echo):
     context = flow_context_echo
-    str_command = context.construct_flow()
-    command = context.execute_flow()
+    str_command = context.construct_flow({"l": "./tests"})
+    print(str_command)
+    command = context.execute_flow(cmd_list=str_command)
     print(command)
     stdout = command[0][1]
     assert str_command == ["ls -l ./tests"]

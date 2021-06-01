@@ -45,30 +45,34 @@ class HandleFlow(object):
         This creates appropriate flow object from argument supplied from cli
         & invoke construct_flow method of flow object
         """
-        logging.info("executing bash")
+        logging.info(f"dry run mode: {dry_run}")
         outputs = []
+        command_list = []
         data_file = self.parse_file(path, pipeline)
         logging.info("creating fastq directory")
         data_file = create_fastq_dir(data_file, dry_run=dry_run)
 
-        for val in data_file:
+        chosen_pipeline = available_pipeline.get(pipeline)
+        flow_context = FlowConstructor(chosen_pipeline)
+        for data in data_file:
             if available_pipeline.get(pipeline):
-                data = val
                 # skip if pipeline is not dragen
                 if data["pipeline"].lower() != "dragen":
                     continue
-                chosen_pipeline = available_pipeline.get(pipeline)
-                flow_context = FlowConstructor(chosen_pipeline, data=data)
-                if dry_run is True:
-                    constructed_str = flow_context.construct_flow()
-                    if constructed_str:
-                        for strings in constructed_str:
-                            outputs.append(strings)
-                            print(strings)
-                            print("=========")
-                else:
-                    output = flow_context.execute_flow(base_cmd=bash_cmd)
-                    outputs.append(output)
+                constructed_str = flow_context.construct_flow(data=data)
+                # collect all executable command in a list
+                command_list.extend(constructed_str)
+        if dry_run:
+            for command in command_list:
+                outputs.append(command)
+                print(command)
+                print("===========")
+        else:
+            outputs = FlowConstructor.execute_flow(
+                cmd_list=command_list, base_cmd=bash_cmd
+            )
+        # Resets internal class variable
+        chosen_pipeline.reset()
         return outputs
 
 
