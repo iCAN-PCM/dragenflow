@@ -39,7 +39,7 @@ class ConstructDragenPipeline(Flow):
         self.current_t = f"T{self.n}"
         self.last_bam_file = ""
 
-    def command_with_trim(self, excel: dict, pipe_elem: str) -> str:
+    def command_with_trim(self, excel: dict, pipe_elem: str) -> dict:
         pipeline = excel.get("pipeline_parameters")
         cmd_d = BaseDragenCommand(excel, self.profile, f"{pipeline}_{pipe_elem}")
         cmd_d = cmd_d.construct_commands()
