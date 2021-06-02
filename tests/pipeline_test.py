@@ -86,7 +86,7 @@ def test_composite_pipeline_tv(excel_dict, template_dict):
     assert final_dict["qc-coverage-region-1"] == "some/path"
     assert final_dict["tumor-fastq2"] == fastq_file(excel_dict, 2, False)
     assert final_dict["ref-dir"] == "test.m_149"
-    assert final_dict["tumor-bam-input"] == f"{tumor_output}.bam"
+    assert final_dict["tumor-bam-input"] == f"{tumor_output}_tumor.bam"
     # print(final_dict)
     # print(type(final_dict))
     assert type(final_dict) == dict
@@ -106,5 +106,5 @@ def test_composite_pipeline_pv(excel_dict, template_dict):
     assert final_dict["qc-coverage-region-1"] == "some/path"
     assert final_dict["tumor-fastq2"] == fastq_file(excel_dict, 2, False)
     assert final_dict["ref-dir"] == "test.m_149"
-    assert final_dict["tumor-bam-input"] == f"{tumor_output}.bam"
+    assert final_dict["tumor-bam-input"] == f"{tumor_output}_tumor.bam"
     assert final_dict["bam-input"] == f"{last_bam}"

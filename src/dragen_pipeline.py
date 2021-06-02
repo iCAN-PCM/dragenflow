@@ -28,7 +28,7 @@ class ConstructDragenPipeline(Flow):
     def check_trimming(self, excel: dict, cmd: dict) -> None:
         trim = trim_options(excel, self.profile)
         if trim:
-            cmd["read-trimers"] = cmd["read-trimers"] + ",adapter"
+            cmd["read-trimmers"] = cmd["read-trimmers"] + ",adapter"
             cmd["trim-adapter-read1"] = trim
             cmd["trim-adapter-read2"] = trim
         return
@@ -39,6 +39,13 @@ class ConstructDragenPipeline(Flow):
         self.current_t = f"T{self.n}"
         self.last_bam_file = ""
 
+    def command_with_trim(self, excel: dict, pipe_elem: str) -> str:
+        pipeline = excel.get("pipeline_parameters")
+        cmd_d = BaseDragenCommand(excel, self.profile, f"{pipeline}_{pipe_elem}")
+        cmd_d = cmd_d.construct_commands()
+        self.check_trimming(excel, cmd_d)
+        return cmd_d
+
     def constructor(self, excel: dict) -> List[str]:
         # "N" (or empty), it triggers normal_pipeline_template
         pipeline = excel.get("pipeline_parameters")
@@ -46,13 +53,8 @@ class ConstructDragenPipeline(Flow):
             # out put prefix = samplename
             # out put prefix paired = sample.s
             logging.info(f"{excel.get('tumor/normal')}: executing normal_pipeline")
-            cmd_d = BaseDragenCommand(
-                excel, self.profile, f"{pipeline}_normal_pipeline"
-            )
-            cmd_d = cmd_d.construct_commands()
-            self.check_trimming(excel, cmd_d)
+            cmd_d = self.command_with_trim(excel, "normal_pipeline")
             final_str = dragen_cli(cmd_d, excel)
-
             return [final_str]
 
         #  if it's "T" => step 1 run tumor alignment
@@ -63,11 +65,7 @@ class ConstructDragenPipeline(Flow):
             )
             arg_strings = []
             # step 1
-            cmd_d1 = BaseDragenCommand(
-                excel, self.profile, f"{pipeline}_tumor_alignment"
-            )
-            cmd_d1 = cmd_d1.construct_commands()
-            self.check_trimming(excel, cmd_d1)
+            cmd_d1 = self.command_with_trim(excel, "tumor_alignment")
             final_str1 = dragen_cli(cmd_d1, excel)
             arg_strings.append(final_str1)
             # step 2: prepare tumor_variant_call_template
@@ -86,13 +84,9 @@ class ConstructDragenPipeline(Flow):
 
         # if it's N1 => step 1 normal pipeline
         elif excel.get("tumor/normal") == self.current_n:
-            cmd_d = BaseDragenCommand(
-                excel, self.profile, f"{pipeline}_normal_pipeline"
+            final_str = dragen_cli(
+                self.command_with_trim(excel, "normal_pipeline"), excel
             )
-            cmd_d = cmd_d.construct_commands()
-            logging.info(f"{self.current_n}: preparing normal_pipeline")
-            final_str = dragen_cli(cmd_d, excel)
-            self.last_bam_file = f"{cmd_d['output-file-prefix']}.bam"
             return [final_str]
 
         # if it's T1 => step 1  run tumor alignment
@@ -102,10 +96,7 @@ class ConstructDragenPipeline(Flow):
             arg_string = []
             # step 1 tumor alignment
             logging.info(f"{self.current_t}: preparing tumor alignment template")
-            cmd_d1 = BaseDragenCommand(
-                excel, self.profile, f"{pipeline}_tumor_alignment"
-            )
-            cmd_d1 = cmd_d1.construct_commands()
+            cmd_d1 = self.command_with_trim(excel, "tumor_alignment")
             final_str1 = dragen_cli(cmd_d1, excel)
             arg_string.append(final_str1)
 
@@ -132,11 +123,7 @@ class ConstructDragenPipeline(Flow):
                 f"{excel.get('tumor/normal')},{self.n}, No pipeline info: \
                 executing by default normal_pipeline"
             )
-            cmd_d = BaseDragenCommand(
-                excel,
-                self.profile,
-                f"{pipeline}_normal_pipeline",
+            final_str = dragen_cli(
+                self.command_with_trim(excel, "normal_pipeline"), excel
             )
-            cmd_d = cmd_d.construct_commands()
-            final_str = dragen_cli(cmd_d, excel)
             return [final_str]

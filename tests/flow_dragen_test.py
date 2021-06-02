@@ -51,7 +51,7 @@ def test_dragen_normal_with_trim(dragen_flow, excel_dict):
     dragen_cmd = dragen.constructor(excel_dict)
     assert "--trim-adapter-read1" in dragen_cmd[0]
     assert "--trim-adapter-read2" in dragen_cmd[0]
-    assert "--read-trimers" in dragen_cmd[0]
+    assert "--read-trimmers" in dragen_cmd[0]
 
 
 def test_dragen_tumor(dragen_flow, excel_dict):

@@ -57,7 +57,7 @@ class TumorVariantCommands(Commands):
 
     def construct_commands(self) -> dict:
 
-        cmd_dict = {"tumor-bam-input": f"{self.tumor['output-file-prefix']}.bam"}
+        cmd_dict = {"tumor-bam-input": f"{self.tumor['output-file-prefix']}_tumor.bam"}
 
         return cmd_dict
 
@@ -74,5 +74,6 @@ class PairedVariantCommands(Commands):
     def construct_commands(self) -> dict:
         cmd_dict = {}
         cmd_dict["bam-input"] = self.normal_bam
-        cmd_dict["tumor-bam-input"] = f"{self.tumor['output-file-prefix']}.bam"
+        cmd_dict["tumor-bam-input"] = f"{self.tumor['output-file-prefix']}_tumor.bam"
+        cmd_dict["output-file-prefix"] = f"{self.tumor['output-file-prefix']}.tn"
         return cmd_dict
