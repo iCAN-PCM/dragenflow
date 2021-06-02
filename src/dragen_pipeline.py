@@ -97,7 +97,8 @@ class ConstructDragenPipeline(Flow):
                 f"{excel.get('tumor/normal')}:: preparing tumor alignment template"
             )
             # quick check if proper order exist
-            assert int(excel["tumor/normal"][1:]) == self._n, "incorrect row order"
+            if int(excel["tumor/normal"][1:]) != self._n:
+                raise RuntimeError("incorrect row ordering")
             # step 1 tumor alignment
             arg_string = []
             cmd_d1 = self.command_with_trim(excel, "tumor_alignment")
