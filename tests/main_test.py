@@ -47,3 +47,18 @@ def test_construct_str(get_handle):
     for val in list_str:
         assert type(val) == str
         assert "{" not in val
+
+
+def test_execute_bash_2(get_handle):
+    list_str = get_handle.execute_bash(
+        "./path/210317_A00464_0300_BHW7FTDMXX/test_samplesheet_2.csv",
+        "dragen",
+        dry_run=False,
+    )
+    print(f"len of : {len(list_str)}")
+    assert len(list_str) == 12
+    for val in list_str:
+        if type(val[0]) == int:
+            assert val[0] == 0
+        else:
+            assert val[0][0] == 0
