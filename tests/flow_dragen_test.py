@@ -107,3 +107,11 @@ def test_dragen_normal_tumor2(dragen_flow, excel_dict):
     assert type(dragen_cmd[1]) == str
     assert "{" not in str(dragen_cmd[0])
     assert "{" not in str(dragen_cmd[1])
+
+
+@pytest.mark.parametrize(
+    "test_input,expected",
+    [("", False), ("N1", False), ("T4", True), ("B2", False), ("T99", True)],
+)
+def test_re(dragen_flow, test_input, expected):
+    assert bool(dragen_flow._t_pattern.match(test_input)) == expected
