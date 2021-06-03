@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import shlex
 import subprocess
+import os
 from typing import List
 
 
@@ -43,7 +44,8 @@ class FlowConstructor:
         base_cmd = kwargs.get("base_cmd")
         command_list = kwargs.get("cmd_list")
         list_output = []
-        for string in command_list:
+        for path, string in command_list:
+            os.chdir(path)
             if base_cmd == "echo":
                 arg_list = ["echo", string]
                 output = subprocess.run(
