@@ -65,7 +65,7 @@ def create_fastq_dir(excel: list, dry_run: bool = False) -> List[dict]:
     for row in excel:
         path = Path(row["file_path"]).absolute()
         sample_id = row["SampleID"] if row.get("SampleID") else row["Sample_ID"]
-        new_path = path.parent / sample_id
+        new_path = path.parent / row["Sample_Project"] / sample_id
         if not dry_run:
             new_path.mkdir(exist_ok=True)
         row["fastq_dir"] = new_path
@@ -82,25 +82,25 @@ def fastq_file(excel: dict, read_n: int, copy_file: bool = True) -> str:
         file_name = (
             f"{sample_name}_S{sample_number}_L00{lane_number}_R{read_n}_001.fastq.gz"
         )
-
     else:
         file_name = f"{sample_name}_S{sample_number}_R{read_n}_001.fastq.gz"
     if copy_file:
-        copy_fast_q(excel, file_name)
+        move_fast_q(excel, file_name)
     return file_name
 
 
-def copy_fast_q(excel: dict, fastq_f: str) -> None:
+def move_fast_q(excel: dict, fastq_f: str) -> None:
 
     sample_sheet_path = Path(excel["file_path"]).absolute().parent
-    path_to_fastq = (
-        sample_sheet_path / "demultiplex" / excel["Sample_Project"] / fastq_f
-    )
+    path_to_fastq = sample_sheet_path / excel["Sample_Project"] / fastq_f
     destination_of_fastq = Path(excel["fastq_dir"])
+    final_fastq_path = destination_of_fastq / fastq_f
     if not excel["dry_run"]:
         if path_to_fastq.exists():
-            shutil.copy(path_to_fastq, destination_of_fastq)
-        else:
+            # in case if file already exist in destination
+            if not final_fastq_path.exists():
+                shutil.move(str(path_to_fastq), str(destination_of_fastq))
+        elif not (destination_of_fastq / fastq_f).exists():
             print("")
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), str(path_to_fastq)

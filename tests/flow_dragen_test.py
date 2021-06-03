@@ -34,10 +34,23 @@ def test_dragen_normal(dragen_flow, excel_dict):
     excel_dict["tumor/normal"] = "N"
     dragen_cmd = dragen.constructor(excel_dict)
     assert type(dragen_cmd) == list
-    assert dragen.n == 1
-    assert dragen.current_n == "N1"
+    assert dragen._n == 0
     assert "{" not in str(dragen_cmd[0])
     assert dragen.last_bam_file == ""
+    # trimmers shouldn't be here
+    assert "--trim-adapter-read1" not in dragen_cmd[0]
+    assert "--trim-adapter-read2" not in dragen_cmd[0]
+
+
+def test_dragen_normal1(dragen_flow, excel_dict):
+    excel_dict = excel_dict
+    dragen = dragen_flow
+    excel_dict["tumor/normal"] = "N1"
+    dragen_cmd = dragen.constructor(excel_dict)
+    assert type(dragen_cmd) == list
+    assert dragen._n == 1
+    assert "{" not in str(dragen_cmd[0])
+    assert dragen.last_bam_file == "test_sampleID.bam"
     # trimmers shouldn't be here
     assert "--trim-adapter-read1" not in dragen_cmd[0]
     assert "--trim-adapter-read2" not in dragen_cmd[0]
@@ -61,8 +74,7 @@ def test_dragen_tumor(dragen_flow, excel_dict):
     dragen_cmd = dragen.constructor(excel_dict)
     assert type(dragen_cmd) == list
     assert len(dragen_cmd) == 2
-    assert dragen.n == 1
-    assert dragen.current_n == "N1"
+    assert dragen._n == 0
     assert "{" not in str(dragen_cmd[0])
     assert dragen.last_bam_file == ""
 
@@ -74,25 +86,32 @@ def test_dragen_normal_tumor1(dragen_flow, excel_dict):
     dragen_cmd = dragen.constructor(excel_dict)
     assert type(dragen_cmd) == list
     assert len(dragen_cmd) == 1
-    assert dragen.n == 1
-    assert dragen.current_n == "N1"
+    assert dragen._n == 1
+    assert dragen.last_bam_file == "test_sampleID.bam"
+    dragen.reset()
     assert "{" not in str(dragen_cmd[0])
-    # assert dragen.last_bam_file == "output-prefix_2.bam"
 
 
 def test_dragen_normal_tumor2(dragen_flow, excel_dict):
     excel_dict = excel_dict
     dragen = dragen_flow
     excel_dict["tumor/normal"] = "T1"
-    assert dragen_flow.n == 1
-    assert dragen_flow.current_t == "T1"
+    assert dragen_flow._n == 0
+    dragen_flow._n = 1
     dragen_cmd = dragen.constructor(excel_dict)
     assert type(dragen_cmd) == list
     assert len(dragen_cmd) == 2
-    assert dragen.n == 2
-    assert dragen.current_t == "T2"
+    assert dragen._n == 1
     assert dragen.last_bam_file == ""
     assert type(dragen_cmd[0]) == str
     assert type(dragen_cmd[1]) == str
     assert "{" not in str(dragen_cmd[0])
     assert "{" not in str(dragen_cmd[1])
+
+
+@pytest.mark.parametrize(
+    "test_input,expected",
+    [("", False), ("N1", False), ("T4", True), ("B2", False), ("T99", True)],
+)
+def test_re(dragen_flow, test_input, expected):
+    assert bool(dragen_flow._t_pattern.match(test_input)) == expected
