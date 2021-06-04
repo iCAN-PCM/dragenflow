@@ -371,7 +371,7 @@
                     "ref-dir": "/staging/human/reference/hg38/uscs/hg38.fa.k_21.f_16.m_149_cnv"
                 }
             },
-            "noiseprofile": "'put noise profile for variant calling here'",
+            "noiseprofile": "/fas/NGS/pipes/dragen/configs/noise_profile/WGS_hg38_v1.0_systematic_noise.bed",
             "cnvpanelofnormals": "'put CNV PoN here'"
         },
         "adapters": {
