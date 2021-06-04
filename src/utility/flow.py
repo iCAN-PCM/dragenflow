@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-import os
 import shlex
 import subprocess
 from typing import List
@@ -45,7 +44,6 @@ class FlowConstructor:
         command_list = kwargs.get("cmd_list")
         list_output = []
         for path, string in command_list:
-            os.chdir(path)
             if base_cmd == "echo":
                 arg_list = ["echo", string]
                 output = subprocess.run(
@@ -53,13 +51,12 @@ class FlowConstructor:
                     universal_newlines=True,
                     stdout=subprocess.PIPE,
                     shell=False,
+                    cwd=path,
                 )
             else:
                 arg_list = shlex.split(string)
                 output = subprocess.run(
-                    arg_list,
-                    universal_newlines=True,
-                    stdout=subprocess.PIPE,
+                    arg_list, universal_newlines=True, stdout=subprocess.PIPE, cwd=path
                 )
             list_output.append((output.returncode, output.stdout))
         return list_output

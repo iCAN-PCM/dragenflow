@@ -1,6 +1,5 @@
 import argparse
 import logging
-import os
 from typing import List
 
 from src.utility.flow import FlowConstructor
@@ -64,7 +63,6 @@ class HandleFlow(object):
                 # collect all executable command in a list
                 for c in constructed_str:
                     command_list.append([str(data["fastq_dir"]), c])
-        orig_dir = os.getcwd()
         if dry_run:
             for sdir, command in command_list:
                 outputs.append(command)
@@ -77,7 +75,7 @@ class HandleFlow(object):
             )
         # Resets internal class variable
         chosen_pipeline.reset()
-        os.chdir(orig_dir)
+        # os.chdir(orig_dir)
         return outputs
 
 
