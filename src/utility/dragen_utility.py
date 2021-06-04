@@ -180,7 +180,7 @@ def file_parse(
 def trim_options(excel: dict, template: dict) -> str:
     # check if adaptertrim exist in sample sheet
     if excel.get("AdapterTrim"):
-        if excel["AdapterTrim"] == "truseq":
+        if excel["AdapterTrim"] == "truseq" or excel["AdapterTrim"] == "nextera":
             return template["adapters"][excel["AdapterTrim"]]
         elif excel["AdapterTrim"].startswith("/"):
             return excel["AdapterTrim"]
