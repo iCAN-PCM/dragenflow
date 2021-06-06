@@ -34,7 +34,10 @@ def template_dict():
             "name": "test_pipeline",
         },
         "test_pipeline2": {"tumor-bam-input": "{tumorbam}", "name": "test_pipeline2"},
-        "ref_parameters": {"RefGenome": {"test_genome": {"ref-dir": "test.m_149"}}},
+        "ref_parameters": {
+            "RefGenome": {"test_genome": {"ref-dir": "test.m_149"}},
+            "noiseprofile": "'put noise profile for variant calling here'",
+        },
     }
     return data
 

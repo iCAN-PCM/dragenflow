@@ -64,7 +64,7 @@ class ConstructDragenPipeline(Flow):
             arg_strings = []
             # step 1
             cmd_d1 = self.command_with_trim(excel, "tumor_alignment")
-            final_str1 = dragen_cli(cmd_d1, excel)
+            final_str1 = dragen_cli(cmd_d1, excel, "alignment")
             arg_strings.append(final_str1)
             # step 2: prepare tumor_variant_call_template
             # define tumor bam input => outputfile-prefix.bam (from previous run)
@@ -76,7 +76,7 @@ class ConstructDragenPipeline(Flow):
             tv_cmd = TumorVariantCommands(tumor=cmd_d1)
             cmd_d2.add(base_cmd)
             cmd_d2.add(tv_cmd)
-            final_str2 = dragen_cli(cmd_d2.construct_commands(), excel)
+            final_str2 = dragen_cli(cmd_d2.construct_commands(), excel, "analysis")
             arg_strings.append(final_str2)
             return arg_strings
 
@@ -102,7 +102,7 @@ class ConstructDragenPipeline(Flow):
             # step 1 tumor alignment
             arg_string = []
             cmd_d1 = self.command_with_trim(excel, "tumor_alignment")
-            final_str1 = dragen_cli(cmd_d1, excel)
+            final_str1 = dragen_cli(cmd_d1, excel, "alignment")
             arg_string.append(final_str1)
 
             # step 2 paired variant call
@@ -116,7 +116,7 @@ class ConstructDragenPipeline(Flow):
             pv_cmd = PairedVariantCommands(self.last_bam_file, cmd_d1)
             cmd_d2.add(base_cmd)
             cmd_d2.add(pv_cmd)
-            final_str2 = dragen_cli(cmd_d2.construct_commands(), excel)
+            final_str2 = dragen_cli(cmd_d2.construct_commands(), excel, "analysis")
             arg_string.append(final_str2)
             return arg_string
         else:

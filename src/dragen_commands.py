@@ -31,6 +31,7 @@ class BaseDragenCommand(Commands):
             "RGSM-tumor": set_rgism(self.excel),
             # depending on the use case this can be directly added to json-template file
             "intermediate-results-dir": "/staging/intermediate",
+            "vc-systematic-noise": template["ref_parameters"]["noiseprofile"],
         }
 
     def construct_commands(self) -> dict:
