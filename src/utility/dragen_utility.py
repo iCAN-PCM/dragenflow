@@ -63,6 +63,8 @@ def set_rgism(excel: dict) -> str:
 
 def create_fastq_dir(excel: list, dry_run: bool = False) -> List[dict]:
     for row in excel:
+        if row["pipeline"].lower() != "dragen":
+            continue
         path = Path(row["file_path"]).absolute()
         sample_id = row["SampleID"] if row.get("SampleID") else row["Sample_ID"]
         new_path = path.parent / row["Sample_Project"] / sample_id
@@ -100,7 +102,7 @@ def move_fast_q(excel: dict, fastq_f: str) -> None:
             # in case if file already exist in destination
             if not final_fastq_path.exists():
                 shutil.move(str(path_to_fastq), str(destination_of_fastq))
-        elif not (destination_of_fastq / fastq_f).exists():
+        elif not final_fastq_path.exists():
             print("")
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), str(path_to_fastq)
@@ -115,9 +117,11 @@ def check_key(dct: dict, k: str, val: str) -> dict:
         raise KeyError
 
 
-def dragen_cli(cmd: dict, excel: dict) -> str:
+def dragen_cli(cmd: dict, excel: dict, postf: str = "") -> str:
     default_str = " ".join(f"--{key} {val}" for (key, val) in cmd.items())
-    final_str = f"grun.py -n dragen-{excel['Sample_Name']} -L logs -q  dragen.q -c  \
+    if postf:
+        postf = "-" + postf
+    final_str = f"grun.py -n dragen-{excel['Sample_Name']}{postf} -L logs -q  dragen.q -c  \
         'dragen {default_str}'"
     return final_str
 
