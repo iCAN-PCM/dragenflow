@@ -1,6 +1,5 @@
 import argparse
 import logging
-import os
 from typing import List
 
 from src.utility.flow import FlowConstructor
@@ -56,6 +55,7 @@ class HandleFlow(object):
         chosen_pipeline = available_pipeline.get(pipeline)
         flow_context = FlowConstructor(chosen_pipeline)
         for data in data_file:
+            logging.info("Creating dragen commands")
             if available_pipeline.get(pipeline):
                 # skip if pipeline is not dragen
                 if data["pipeline"].lower() != "dragen":
@@ -64,20 +64,21 @@ class HandleFlow(object):
                 # collect all executable command in a list
                 for c in constructed_str:
                     command_list.append([str(data["fastq_dir"]), c])
-        orig_dir = os.getcwd()
         if dry_run:
-            for sdir, command in command_list:
-                outputs.append(command)
-                print("chdir " + sdir)
-                print(command)
+            for path, str_command in command_list:
+                print("chdir " + path)
+                outputs.append(str_command)
+                print(str_command)
                 print("===========")
         else:
-            outputs = FlowConstructor.execute_flow(
-                cmd_list=command_list, base_cmd=bash_cmd
-            )
-        # Resets internal class variable
-        chosen_pipeline.reset()
-        os.chdir(orig_dir)
+            logging.info("Executing commands:")
+            for path, str_command in command_list:
+                output, arglist = FlowConstructor.execute_flow(
+                    command=str_command, base_cmd=bash_cmd, wd_path=path
+                )
+                logging.info(f"Executed command: {arglist}")
+                logging.info(f"Return code: {output.returncode}")
+                outputs.append([(output.returncode, output.stdout)])
         return outputs
 
 
@@ -91,10 +92,7 @@ if __name__ == "__main__":
         "-p", "--path", type=str, action="store", required=True, nargs=1
     )
     parser.add_argument("-d", "--dryrun", default=False, action="store_true")
-    parser.add_argument("-q", "--queue", default=False, action="store_true")
+    parser.add_argument("-c", "--cmd", default=None)
     args = parser.parse_args()
     handle = HandleFlow()
-    bash_str = "echo"
-    if args.queue:
-        bash_str = "queue"
-    handle.execute_bash(path=args.path[0], bash_cmd=bash_str, dry_run=args.dryrun)
+    handle.execute_bash(path=args.path[0], bash_cmd=args.cmd, dry_run=args.dryrun)

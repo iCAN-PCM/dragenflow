@@ -121,8 +121,7 @@ def dragen_cli(cmd: dict, excel: dict, postf: str = "") -> str:
     default_str = " ".join(f"--{key} {val}" for (key, val) in cmd.items())
     if postf:
         postf = "-" + postf
-    final_str = f"grun.py -n dragen-{excel['Sample_Name']}{postf} -L logs -q  dragen.q -c  \
-        'dragen {default_str}'"
+    final_str = f"grun.py -n dragen-{excel['Sample_Name']}{postf} -L logs -q  dragen.q -c 'dragen {default_str}'"  # noqa: E501, B950
     return final_str
 
 
