@@ -55,11 +55,11 @@ class HandleFlow(object):
         chosen_pipeline = available_pipeline.get(pipeline)
         flow_context = FlowConstructor(chosen_pipeline)
         for data in data_file:
-            logging.info("Creating dragen commands")
             if available_pipeline.get(pipeline):
                 # skip if pipeline is not dragen
                 if data["pipeline"].lower() != "dragen":
                     continue
+                logging.info("Creating dragen commands")
                 constructed_str = flow_context.construct_flow(data=data)
                 # collect all executable command in a list
                 for c in constructed_str:
