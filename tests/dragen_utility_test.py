@@ -117,9 +117,8 @@ def test_parse_file():
     path = "./path/210317_A00464_0300_BHW7FTDMXX/test_samplesheet.csv"
     data = file_parse(path)
     assert type(data) == list
-    assert len(data) == 12
-    assert data[8]["tumor/normal"] == "N2"
-    assert data[9]["tumor/normal"] == "T2"
+    # total row = 12 and row containing dragen = 9
+    assert len(data) == 9
 
 
 def test_fastq_file(excel_dict):
