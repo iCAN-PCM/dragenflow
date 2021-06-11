@@ -146,6 +146,21 @@ def basic_reader(path: str) -> list:
         return list(reader)
 
 
+def trim_options(excel: dict, template: dict) -> str:
+    # check if adaptertrim exist in sample sheet
+    if excel.get("AdapterTrim"):
+        if excel["AdapterTrim"] == "truseq" or excel["AdapterTrim"] == "nextera":
+            return template["adapters"][excel["AdapterTrim"]]
+        elif excel["AdapterTrim"].startswith("/"):
+            return excel["AdapterTrim"]
+        else:
+            raise ValueError(
+                f"Cannot retrieve adapters for value: {excel['AdapterTrim']}"
+            )
+    else:
+        return ""
+
+
 def file_parse(
     path: str, head_identifier="Lane", sorting_col="tumor/normal"
 ) -> List[dict]:
@@ -169,27 +184,50 @@ def file_parse(
         reader = [val for val in reader]
         for row in reader:
             row["row_index"] = row_index
+            row["file_path"] = path
             row_index += 1
 
-        sorted_dict = sorted(
-            reader, key=lambda row: custom_sort(row[sorting_col]), reverse=False
-        )
-        for dict_ in sorted_dict:
-            dict_["file_path"] = path
+        # Remove the pipeline that is not dragen
+        # This must of be done before setting index, we need to preserve index
+        reader = [row for row in reader if row["pipeline"] == "dragen"]
 
-        return sorted_dict
+        return reader
 
 
-def trim_options(excel: dict, template: dict) -> str:
-    # check if adaptertrim exist in sample sheet
-    if excel.get("AdapterTrim"):
-        if excel["AdapterTrim"] == "truseq" or excel["AdapterTrim"] == "nextera":
-            return template["adapters"][excel["AdapterTrim"]]
-        elif excel["AdapterTrim"].startswith("/"):
-            return excel["AdapterTrim"]
+def run_type(excel: List[dict]) -> List[dict]:
+
+    for dt in excel:
+        if dt["Is_tumor"] == "0" or dt["Is_tumor"] == "":
+            dt["run_type"] = "germline"
+        elif dt["Is_tumor"] == "1" and dt["matching_normal_sample"] == "":
+            dt["run_type"] = "somatic single"
+        elif dt["Is_tumor"] == "1" and dt["matching_normal_sample"] != "":
+            sample_id = dt["matching_normal_sample"]
+            sample_project = dt["Sample_Project"]
+            if check_sample(excel, sample_id, sample_project):
+                dt["run_type"] = "somatic paired"
+            else:
+                raise RuntimeError(
+                    f"sample id {sample_id} doesn't exist at {dt['row_index']}"
+                )
         else:
-            raise ValueError(
-                f"Cannot retrieve adapters for value: {excel['AdapterTrim']}"
-            )
-    else:
-        return ""
+            raise RuntimeError(f"invalid entry at index {dt['row_index']}")
+    return excel
+
+
+def check_sample(excel: List[dict], sample_id: str, sample_project: str) -> bool:
+    for dt in excel:
+        if dt["Sample_ID"] == sample_id and dt["Sample_Project"] == sample_project:
+            return True
+        else:
+            continue
+    return False
+
+
+def sort_list(excel: List[dict], sorting_col: str = "run_type") -> List[dict]:
+    sorted_list = sorted(
+        excel,
+        key=lambda row: 1 if row[sorting_col] == "germline" else 0,
+        reverse=True,
+    )
+    return sorted_list

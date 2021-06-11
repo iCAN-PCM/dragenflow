@@ -1,0 +1,19 @@
+[Header],,,,,,,,,,,,,,,,,,,,,,,,
+Workflow,GenerateFASTQ,,,,,,,,,,,,,,,,,,,,,,,
+Date,7.10.2020,,,,,,,,,,,,,,,,,,,,,,,
+[Data],,,,,,,,,,,,,,,,,,,,,,,,
+Lane,Sample_Project,Sample_ID,Sample_Name,Index,Index2,Customer,FIMM_Destination,FIMM_batchID,LabRecipe,Operator,RefGenome,TargetRegions,Exp_laneYield,AdapterTrim,pipeline,pipeline_parameters,queue,existing_sample,method,comments,override,Is_tumor,matching_normal_sample,notes
+1,testproject,testsample,testsample,TTGATCCG1,AAGCTCAC,testclient,/home/local/aekuosma/testfolder,test,,,GRCh38,/fs/vault/pipelines/vcp/target_files/cancer_panel/FIMM_pan_cancer_panel_hg38.gff,5,truseq,dragen,ican-exome,,,,,,1,,somatic_single
+,,,,,,testclient,/home/local/aekuosma/testfolder,test,,,GRCh38,/fs/vault/pipelines/vcp/target_files/cancer_panel/FIMM_pan_cancer_panel_hg38.gff,5,truseq,,ican-exome,,,,,,0,,
+1,testproject,testsample,testsample,TTGATCCG2,AAGCTCAC,testclient,/home/local/aekuosma/testfolder,test,,,GRCh38,/fs/vault/pipelines/vcp/target_files/cancer_panel/FIMM_pan_cancer_panel_hg38.gff,5,truseq,dragen,ican-exome,,,,,,,,germline
+1,testproject,testsample1.5,testsample1.5,TTGATCCG3,CGCGTATT,testclient,/home/local/aekuosma/testfolder,test,,,GRCh38,/fs/vault/pipelines/vcp/target_files/cancer_panel/FIMM_pan_cancer_panel_hg38.gff,5,truseq,dragen,ican-exome,,,,,,1,testsample1.23,somatic_paired(sample_id+project match)
+1,testproject2,testsample2,testsample2,CTATCGCA4,CGCGTATT,testclient2,/home/local/aekuosma/testfolder2,test,,,GRCh38,/fs/vault/pipelines/vcp/target_files/cancer_panel/FIMM_pan_cancer_panel_hg38.gff,5,truseq,dragen,exome-umi,,,,,,0,,germline
+1,testproject3,Testsample3.1,testsample3,CTATCGCA5,CGCGTATT,testclient3,/home/local/aekuosma/testfolder3,test,,,GRCh38,/fs/vault/pipelines/vcp/target_files/cancer_panel/FIMM_pan_cancer_panel_hg38.gff,5,truseq,dragen,genome,,,,,,0,,germline
+1,testproject3,Testsample3.2,testsample3,CTATCGCA6,CGCGTATT,testclient3,/home/local/aekuosma/testfolder3,test,,,GRCh38,/fs/vault/pipelines/vcp/target_files/cancer_panel/FIMM_pan_cancer_panel_hg38.gff,5,truseq,dragen,exome-umi,,,,,,1,Testsample3.1,somatic_paired(sample_id+project match)
+1,testproject3,Testsample3.3,testsample3,CTATCGCA7,CGCGTATT,testclient3,/home/local/aekuosma/testfolder3,test,,,GRCh38,/fs/vault/pipelines/vcp/target_files/cancer_panel/FIMM_pan_cancer_panel_hg38.gff,5,truseq,dragen,genome,,,,,,1,Testsample3.1,somatic_paired(sample_id+project match)
+2,testproject,testsample,testsample1.23,TTGATCCG8,AAGCTCAC,testclient,/home/local/aekuosma/testfolder,test,,,GRCh38,/fs/vault/pipelines/vcp/target_files/cancer_panel/FIMM_pan_cancer_panel_hg38.gff,5,truseq,dragen,ican-exome,,,,,,0,,
+1,testproject4,Testsample4.1,Testsample4.1,CTATCGCA9,CGCGTATT,testclient3,/home/local/aekuosma/testfolder3,test,,,GRCh38,/fs/vault/pipelines/vcp/target_files/cancer_panel/FIMM_pan_cancer_panel_hg38.gff,5,truseq,dragen,ican-exome-umi,,,,,,1,Testsample4.3,somatic_paired(sample_id+project match)
+1,testproject4,Testsample4.2,Testsample4.1,CTATCGCA10,CGCGTATT,testclient3,/home/local/aekuosma/testfolder3,test,,,GRCh38,/fs/vault/pipelines/vcp/target_files/cancer_panel/FIMM_pan_cancer_panel_hg38.gff,5,truseq,dragen,genome,,,,,,0,,germline
+1,testproject4,Testsample4.3,Testsample4.1,CTATCGCA11,CGCGTATT,testclient3,/home/local/aekuosma/testfolder3,test,,,GRCh38,/fs/vault/pipelines/vcp/target_files/cancer_panel/FIMM_pan_cancer_panel_hg38.gff,5,truseq,dragen,ican-exome-umi,,,,,,0,,germline
+2,testproject,testsample1.23,testsample,TTGATCCG12,AAGCTCAC,testclient,/home/local/aekuosma/testfolder,test,,,GRCh38,/fs/vault/pipelines/vcp/target_files/cancer_panel/FIMM_pan_cancer_panel_hg38.gff,5,truseq,dragen,ican-exome,,,,,,0,,germline
+2,testproject,testsample1.23,testsample,TTGATCCG12,AAGCTCAC,testclient,/home/local/aekuosma/testfolder,test,,,GRCh38,/fs/vault/pipelines/vcp/target_files/cancer_panel/FIMM_pan_cancer_panel_hg38.gff,5,truseq,,ican-exome,,,,,,0,,

@@ -4,7 +4,13 @@ from typing import List
 
 from src.utility.flow import FlowConstructor
 from src.dragen_pipeline import ConstructDragenPipeline
-from src.utility.dragen_utility import basic_reader, create_fastq_dir, file_parse
+from src.utility.dragen_utility import (
+    basic_reader,
+    create_fastq_dir,
+    file_parse,
+    run_type,
+    sort_list,
+)
 
 # register flows/pipeline
 available_pipeline = {"dragen": ConstructDragenPipeline()}
@@ -51,7 +57,9 @@ class HandleFlow(object):
         data_file = self.parse_file(path, pipeline)
         logging.info("creating fastq directory")
         data_file = create_fastq_dir(data_file, dry_run=dry_run)
-
+        logging.info("assigning runtype")
+        data_file1 = run_type(data_file)
+        data_file = sort_list(data_file1)
         chosen_pipeline = available_pipeline.get(pipeline)
         flow_context = FlowConstructor(chosen_pipeline)
         for data in data_file:

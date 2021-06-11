@@ -19,8 +19,7 @@ from .utility.flow import Flow
 
 class ConstructDragenPipeline(Flow):
     def __init__(self):
-        self._n = 0
-        self.last_bam_file = ""
+        self.all_bam_file = {}
         self.profile = load_json(script_path("dragen_config.json"))["profile1"]
         self.current_seq = ""
         self._n_pattern = re.compile("^N[0-9]+$")
@@ -47,17 +46,19 @@ class ConstructDragenPipeline(Flow):
     def constructor(self, excel: dict) -> List[str]:
         # "N" (or empty), it triggers normal_pipeline_template
         pipeline = excel.get("pipeline_parameters")
-        if excel.get("tumor/normal") == "N":
+        if excel["run_type"] == "germline":
             # out put prefix = samplename
             # out put prefix paired = sample.s
             logging.info(f"{excel.get('tumor/normal')}: executing normal_pipeline")
             cmd_d = self.command_with_trim(excel, "normal_pipeline")
+            # store bam file
+            self.all_bam_file[excel["Sample_ID"]] = f"{cmd_d['output-file-prefix']}.bam"
             final_str = dragen_cli(cmd_d, excel)
             return [final_str]
 
         #  if it's "T" => step 1 run tumor alignment
         #                 step 2 run tumor variant call
-        elif excel.get("tumor/normal") == "T":
+        elif excel["run_type"] == "somatic_single":
             logging.info(
                 f"{excel.get('tumor/normal')}:preparing tumor alignment template"
             )
@@ -80,25 +81,12 @@ class ConstructDragenPipeline(Flow):
             arg_strings.append(final_str2)
             return arg_strings
 
-        # if it's N1 => step 1 normal pipeline
-        elif self._n_pattern.match(excel.get("tumor/normal")):
-            logging.info(f"{excel.get('tumor/normal')}: preparing normal_pipeline")
-            cmd_d = self.command_with_trim(excel, "normal_pipeline")
-            final_str = dragen_cli(cmd_d, excel)
-            self.last_bam_file = f"{cmd_d['output-file-prefix']}.bam"
-            self._n = int(excel["tumor/normal"][1:])
-            logging.info(f"setting new n value: {self._n}")
-            return [final_str]
-
         # if it's T1 => step 1  run tumor alignment
         #               step 2 paired variant calls
-        elif self._t_pattern.match(excel.get("tumor/normal")):
+        elif excel["run_type"] == "somatic_paired":
             logging.info(
                 f"{excel.get('tumor/normal')}:: preparing tumor alignment template"
             )
-            # quick check if proper order exist
-            if int(excel["tumor/normal"][1:]) != self._n:
-                raise RuntimeError("incorrect row ordering")
             # step 1 tumor alignment
             arg_string = []
             cmd_d1 = self.command_with_trim(excel, "tumor_alignment")
@@ -113,7 +101,9 @@ class ConstructDragenPipeline(Flow):
             base_cmd = BaseDragenCommand(
                 excel, self.profile, f"{pipeline}_paired_variant_call"
             )
-            pv_cmd = PairedVariantCommands(self.last_bam_file, cmd_d1)
+            pv_cmd = PairedVariantCommands(
+                self.all_bam_file[excel["matching_normal_sample"]], cmd_d1
+            )
             cmd_d2.add(base_cmd)
             cmd_d2.add(pv_cmd)
             final_str2 = dragen_cli(cmd_d2.construct_commands(), excel, "analysis")
@@ -121,7 +111,7 @@ class ConstructDragenPipeline(Flow):
             return arg_string
         else:
             logging.info(
-                f"{excel.get('tumor/normal')}, No pipeline info: \
+                f"{excel.get('tumor/normal')}, You shouldn't be here No pipeline info: \
                 executing by default normal_pipeline"
             )
             final_str = dragen_cli(
