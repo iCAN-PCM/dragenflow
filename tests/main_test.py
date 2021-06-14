@@ -27,7 +27,7 @@ def test_execute_bash(get_handle):
         dry_run=False,
     )
     print(f"len of : {len(list_str)}")
-    assert len(list_str) == 12
+    assert len(list_str) == 17
     for val in list_str:
         if type(val[0]) == int:
             assert val[0] == 0
@@ -44,7 +44,7 @@ def test_construct_str(get_handle):
     with open("test1.txt", "w") as f:
         for val in list_str:
             f.write(f"{val} \n")
-    assert len(list_str) == 12
+    assert len(list_str) == 17
     for val in list_str:
         assert type(val) == str
         assert "{" not in val
