@@ -49,7 +49,7 @@ class ConstructDragenPipeline(Flow):
         if excel["run_type"] == "germline":
             # out put prefix = samplename
             # out put prefix paired = sample.s
-            logging.info(f"{excel.get('tumor/normal')}: executing normal_pipeline")
+            logging.info(f"{excel.get('run_type')}: executing normal_pipeline")
             cmd_d = self.command_with_trim(excel, "normal_pipeline")
             # store bam file
             self.all_bam_file[excel["Sample_ID"]] = f"{cmd_d['output-file-prefix']}.bam"
@@ -59,9 +59,7 @@ class ConstructDragenPipeline(Flow):
         #  if it's "T" => step 1 run tumor alignment
         #                 step 2 run tumor variant call
         elif excel["run_type"] == "somatic_single":
-            logging.info(
-                f"{excel.get('tumor/normal')}:preparing tumor alignment template"
-            )
+            logging.info(f"{excel.get('run_type')}:preparing tumor alignment template")
             arg_strings = []
             # step 1
             cmd_d1 = self.command_with_trim(excel, "tumor_alignment")
@@ -85,7 +83,7 @@ class ConstructDragenPipeline(Flow):
         #               step 2 paired variant calls
         elif excel["run_type"] == "somatic_paired":
             logging.info(
-                f"{excel.get('tumor/normal')}:: preparing tumor alignment template"
+                f"{excel.get('run_type')}:: preparing tumor alignment template"
             )
             # step 1 tumor alignment
             arg_string = []
@@ -95,7 +93,7 @@ class ConstructDragenPipeline(Flow):
 
             # step 2 paired variant call
             logging.info(
-                f"{excel.get('tumor/normal')}:: preparing paired varaint call template"
+                f"{excel.get('run_type')}:: preparing paired varaint call template"
             )
             cmd_d2 = CompositeCommands()
             base_cmd = BaseDragenCommand(
@@ -111,7 +109,7 @@ class ConstructDragenPipeline(Flow):
             return arg_string
         else:
             logging.info(
-                f"{excel.get('tumor/normal')}, You shouldn't be here No pipeline info: \
+                f"{excel.get('run_type')}, You shouldn't be here No pipeline info: \
                 executing by default normal_pipeline"
             )
             final_str = dragen_cli(

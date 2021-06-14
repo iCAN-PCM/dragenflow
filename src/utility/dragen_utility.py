@@ -200,18 +200,18 @@ def run_type(excel: List[dict]) -> List[dict]:
         if dt["Is_tumor"] == "0" or dt["Is_tumor"] == "":
             dt["run_type"] = "germline"
         elif dt["Is_tumor"] == "1" and dt["matching_normal_sample"] == "":
-            dt["run_type"] = "somatic single"
+            dt["run_type"] = "somatic_single"
         elif dt["Is_tumor"] == "1" and dt["matching_normal_sample"] != "":
             sample_id = dt["matching_normal_sample"]
             sample_project = dt["Sample_Project"]
             if check_sample(excel, sample_id, sample_project):
-                dt["run_type"] = "somatic paired"
+                dt["run_type"] = "somatic_paired"
             else:
                 raise RuntimeError(
                     f"sample id {sample_id} doesn't exist at {dt['row_index']}"
                 )
         else:
-            raise RuntimeError(f"invalid entry at index {dt['row_index']}")
+            raise ValueError(f"invalid entry at index {dt['row_index']}")
     return excel
 
 
