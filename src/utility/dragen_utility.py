@@ -221,6 +221,7 @@ def run_type(excel: List[dict]) -> List[dict]:
 
 
 def check_sample(excel: List[dict], sample_id: str, sample_project: str) -> bool:
+    # some implicit assumption here that needs to be rechecked
     for dt in excel:
         if dt["SampleID"] == sample_id and dt["Sample_Project"] == sample_project:
             return True
