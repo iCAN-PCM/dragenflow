@@ -52,7 +52,7 @@ class ConstructDragenPipeline(Flow):
             logging.info(f"{excel.get('run_type')}: executing normal_pipeline")
             cmd_d = self.command_with_trim(excel, "normal_pipeline")
             # store bam file
-            self.all_bam_file[excel["Sample_ID"]] = f"{cmd_d['output-file-prefix']}.bam"
+            self.all_bam_file[excel["SampleID"]] = f"{cmd_d['output-file-prefix']}.bam"
             final_str = dragen_cli(cmd_d, excel)
             return [final_str]
 

@@ -161,9 +161,7 @@ def trim_options(excel: dict, template: dict) -> str:
         return ""
 
 
-def file_parse(
-    path: str, head_identifier="Lane", sorting_col="tumor/normal"
-) -> List[dict]:
+def file_parse(path: str, head_identifier="Lane") -> List[dict]:
     # change the variable name
     with open(path, newline="", encoding="utf-8") as inf:
         reader = csv.reader(inf)
@@ -183,6 +181,9 @@ def file_parse(
         row_index = 1
         reader = [val for val in reader]
         for row in reader:
+            # convert Sample_ID into SampleID
+            if row.get("Sample_ID"):
+                row["SampleID"] = row.pop("Sample_ID")
             row["row_index"] = row_index
             row["file_path"] = path
             row_index += 1
@@ -197,11 +198,15 @@ def file_parse(
 def run_type(excel: List[dict]) -> List[dict]:
 
     for dt in excel:
-        if dt["Is_tumor"] == "0" or dt["Is_tumor"] == "":
+        if (
+            dt["Is_tumor"] == "0"
+            or dt["Is_tumor"] == ""
+            or dt["Is_tumor"].lower() == "no"
+        ):
             dt["run_type"] = "germline"
-        elif dt["Is_tumor"] == "1" and dt["matching_normal_sample"] == "":
+        elif len(dt["Is_tumor"]) >= 1 and dt["matching_normal_sample"] == "":
             dt["run_type"] = "somatic_single"
-        elif dt["Is_tumor"] == "1" and dt["matching_normal_sample"] != "":
+        elif len(dt["Is_tumor"]) >= 1 and dt["matching_normal_sample"] != "":
             sample_id = dt["matching_normal_sample"]
             sample_project = dt["Sample_Project"]
             if check_sample(excel, sample_id, sample_project):
@@ -216,8 +221,9 @@ def run_type(excel: List[dict]) -> List[dict]:
 
 
 def check_sample(excel: List[dict], sample_id: str, sample_project: str) -> bool:
+    # some implicit assumption here that needs to be rechecked
     for dt in excel:
-        if dt["Sample_ID"] == sample_id and dt["Sample_Project"] == sample_project:
+        if dt["SampleID"] == sample_id and dt["Sample_Project"] == sample_project:
             return True
         else:
             continue

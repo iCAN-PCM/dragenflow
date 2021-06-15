@@ -8,6 +8,7 @@ from src.utility.dragen_utility import (
     get_ref,
     infer_pipeline,
     load_json,
+    run_type,
     set_rgism,
     trim_options,
 )
@@ -59,6 +60,7 @@ def excel_dict():
         "Sample_Name": "testsample1.5",
         "dry_run": False,
         "row_index": 2,
+        "Sample_Project": "test_project",
     }
     return data
 
@@ -133,3 +135,34 @@ def test_trim_options(excel_dict, template_dict):
     adapter = trim_options(excel_dict, template_dict)
 
     assert adapter == template_dict["adapters"]["truseq"]
+
+
+@pytest.mark.parametrize(
+    "Is_tumor,expected,matching_normal_sample",
+    [
+        ("0", "germline", ""),
+        ("No", "germline", ""),
+        ("", "germline", ""),
+        ("1", "somatic_single", ""),
+        ("Yes", "somatic_single", ""),
+        ("Yes", "somatic_paired", "test_id"),
+    ],
+)
+def test_run_type(excel_dict, Is_tumor, expected, matching_normal_sample):
+    excel_dict["Is_tumor"] = Is_tumor
+    excel_dict["matching_normal_sample"] = matching_normal_sample
+    returned_excel = run_type([excel_dict])
+    assert returned_excel[0]["run_type"] == expected
+
+
+@pytest.mark.parametrize(
+    "Is_tumor,expected,matching_normal_sample",
+    [
+        ("Yes", RuntimeError, "test_id1"),
+    ],
+)
+def test_run_type_error(excel_dict, Is_tumor, expected, matching_normal_sample):
+    excel_dict["Is_tumor"] = Is_tumor
+    excel_dict["matching_normal_sample"] = matching_normal_sample
+    with pytest.raises(expected):
+        run_type([excel_dict])
