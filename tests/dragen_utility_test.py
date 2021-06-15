@@ -158,11 +158,11 @@ def test_run_type(excel_dict, Is_tumor, expected, matching_normal_sample):
 @pytest.mark.parametrize(
     "Is_tumor,expected,matching_normal_sample",
     [
-        ("Yes", "germline", "test_id1"),
+        ("Yes", RuntimeError, "test_id1"),
     ],
 )
-def test_run_type_error(excel_dict, Is_tumor, matching_normal_sample):
+def test_run_type_error(excel_dict, Is_tumor, expected, matching_normal_sample):
     excel_dict["Is_tumor"] = Is_tumor
     excel_dict["matching_normal_sample"] = matching_normal_sample
-    with pytest.raises(RuntimeError):
+    with pytest.raises(expected):
         run_type([excel_dict])
