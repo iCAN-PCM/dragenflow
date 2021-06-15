@@ -9,7 +9,7 @@ def excel_dict():
         "TargetRegions": "some/path",
         "Index": "TTGATCCG",
         "RefGenome": "GRCh38",
-        "Sample_ID": "test_sampleID",
+        "SampleID": "test_sampleID",
         "Sample_Name": "testsample1.5",
         "pipeline_parameters": "genome",
         "file_path": "./path/210317_A00464_0300_BHW7FTDMXX/test_samplesheet.csv",
