@@ -71,6 +71,7 @@ class HandleFlow(object):
                 constructed_str = flow_context.construct_flow(data=data)
                 # collect all executable command in a list
                 for c in constructed_str:
+                    logging.info(f"command:{c}")
                     command_list.append([str(data["fastq_dir"]), c])
         if dry_run:
             for path, str_command in command_list:

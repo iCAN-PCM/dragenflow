@@ -1,5 +1,4 @@
 import logging
-import re
 from typing import List
 
 from .dragen_commands import (
@@ -21,27 +20,24 @@ class ConstructDragenPipeline(Flow):
     def __init__(self):
         self.all_bam_file = {}
         self.profile = load_json(script_path("dragen_config.json"))["profile1"]
-        self.current_seq = ""
-        self._n_pattern = re.compile("^N[0-9]+$")
-        self._t_pattern = re.compile("^T[0-9]+$")
 
-    def check_trimming(self, excel: dict, cmd: dict) -> None:
+    def check_trimming(self, excel: dict, read_trimmer) -> dict:
         trim = trim_options(excel, self.profile)
+        cmd = {}
+        cmd["read-trimmers"] = read_trimmer
         if trim:
             cmd["read-trimmers"] = cmd["read-trimmers"] + ",adapter"
             cmd["trim-adapter-read1"] = trim
             cmd["trim-adapter-read2"] = trim
-        return
-
-    def reset(self):
-        self.last_bam_file = ""
+        return cmd
 
     def command_with_trim(self, excel: dict, pipe_elem: str) -> dict:
         pipeline = excel.get("pipeline_parameters")
-        cmd_d = BaseDragenCommand(excel, self.profile, f"{pipeline}_{pipe_elem}")
-        cmd_d = cmd_d.construct_commands()
-        self.check_trimming(excel, cmd_d)
-        return cmd_d
+        base_cmd = BaseDragenCommand(excel, self.profile, f"{pipeline}_{pipe_elem}")
+        cmd = base_cmd.construct_commands()
+        trim_cmd = self.check_trimming(excel, cmd.get("read-trimmers"))
+
+        return {**cmd, **trim_cmd}
 
     def constructor(self, excel: dict) -> List[str]:
         # "N" (or empty), it triggers normal_pipeline_template
@@ -54,6 +50,7 @@ class ConstructDragenPipeline(Flow):
             # store bam file
             self.all_bam_file[excel["SampleID"]] = f"{cmd_d['output-file-prefix']}.bam"
             final_str = dragen_cli(cmd_d, excel)
+            del cmd_d
             return [final_str]
 
         #  if it's "T" => step 1 run tumor alignment
@@ -77,6 +74,8 @@ class ConstructDragenPipeline(Flow):
             cmd_d2.add(tv_cmd)
             final_str2 = dragen_cli(cmd_d2.construct_commands(), excel, "analysis")
             arg_strings.append(final_str2)
+            del cmd_d1
+            del cmd_d2
             return arg_strings
 
         # if it's T1 => step 1  run tumor alignment
@@ -106,6 +105,8 @@ class ConstructDragenPipeline(Flow):
             cmd_d2.add(pv_cmd)
             final_str2 = dragen_cli(cmd_d2.construct_commands(), excel, "analysis")
             arg_string.append(final_str2)
+            del cmd_d2
+            del cmd_d1
             return arg_string
         else:
             logging.info(
@@ -115,4 +116,5 @@ class ConstructDragenPipeline(Flow):
             final_str = dragen_cli(
                 self.command_with_trim(excel, "normal_pipeline"), excel
             )
+            del cmd_d
             return [final_str]
