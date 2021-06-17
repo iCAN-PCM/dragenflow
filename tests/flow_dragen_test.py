@@ -88,10 +88,13 @@ def test_dragen_normal_tumor1(dragen_flow, excel_dict):
 def test_dragen_normal_tumor2(dragen_flow, excel_dict):
     excel_dict = excel_dict
     dragen = dragen_flow
-    dragen.all_bam_file["test_sampleID"] = "test"
+    # sample_project/smaple_id
+    dragen.all_bam_file["testproject/test_sampleID"] = "test"
     excel_dict["run_type"] = "somatic_paired"
     excel_dict["matching_normal_sample"] = "test_sampleID"
+    excel_dict["matching_normal_sample"] = "test_sampleID"
     dragen_cmd = dragen.constructor(excel_dict)
+    # print(dragen_cmd.all)
     assert type(dragen_cmd) == list
     assert len(dragen_cmd) == 2
     assert type(dragen_cmd[0]) == str

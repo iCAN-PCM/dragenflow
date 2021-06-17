@@ -49,7 +49,9 @@ class ConstructDragenPipeline(Flow):
             logging.info(f"{excel.get('run_type')}: executing normal_pipeline")
             cmd_d = self.command_with_trim(excel, "normal_pipeline")
             # store bam file
-            self.all_bam_file[excel["SampleID"]] = f"{cmd_d['output-file-prefix']}.bam"
+            self.all_bam_file[
+                f"{excel['Sample_Project']}/{excel['SampleID']}"
+            ] = f"../{excel['SampleID']}/{cmd_d['output-file-prefix']}.bam"
             final_str = dragen_cli(cmd_d, excel)
             return [final_str]
 
@@ -96,9 +98,10 @@ class ConstructDragenPipeline(Flow):
             base_cmd = BaseDragenCommand(
                 excel, self.profile, f"{pipeline}_paired_variant_call"
             )
-            pv_cmd = PairedVariantCommands(
-                self.all_bam_file[excel["matching_normal_sample"]], cmd_d1
+            bam_file_key = (
+                f"{excel['Sample_Project']}/{excel['matching_normal_sample']}"
             )
+            pv_cmd = PairedVariantCommands(self.all_bam_file[bam_file_key], cmd_d1)
             cmd_d2.add(base_cmd)
             cmd_d2.add(pv_cmd)
             final_str2 = dragen_cli(cmd_d2.construct_commands(), excel, "analysis")
