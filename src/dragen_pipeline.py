@@ -50,7 +50,6 @@ class ConstructDragenPipeline(Flow):
             # store bam file
             self.all_bam_file[excel["SampleID"]] = f"{cmd_d['output-file-prefix']}.bam"
             final_str = dragen_cli(cmd_d, excel)
-            del cmd_d
             return [final_str]
 
         #  if it's "T" => step 1 run tumor alignment
@@ -74,8 +73,6 @@ class ConstructDragenPipeline(Flow):
             cmd_d2.add(tv_cmd)
             final_str2 = dragen_cli(cmd_d2.construct_commands(), excel, "analysis")
             arg_strings.append(final_str2)
-            del cmd_d1
-            del cmd_d2
             return arg_strings
 
         # if it's T1 => step 1  run tumor alignment
@@ -105,8 +102,6 @@ class ConstructDragenPipeline(Flow):
             cmd_d2.add(pv_cmd)
             final_str2 = dragen_cli(cmd_d2.construct_commands(), excel, "analysis")
             arg_string.append(final_str2)
-            del cmd_d2
-            del cmd_d1
             return arg_string
         else:
             logging.info(
@@ -116,5 +111,4 @@ class ConstructDragenPipeline(Flow):
             final_str = dragen_cli(
                 self.command_with_trim(excel, "normal_pipeline"), excel
             )
-            del cmd_d
             return [final_str]

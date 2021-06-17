@@ -70,6 +70,7 @@ class HandleFlow(object):
                 logging.info("Creating dragen commands")
                 constructed_str = flow_context.construct_flow(data=data)
                 # collect all executable command in a list
+                logging.info(f"Input dict:{data}")
                 for c in constructed_str:
                     logging.info(f"command:{c}")
                     command_list.append([str(data["fastq_dir"]), c])

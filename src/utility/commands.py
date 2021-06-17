@@ -33,10 +33,10 @@ class CompositeCommands(Commands):
     def is_composite(self) -> bool:
         return True
 
-    def construct_commands(self) -> dict:
+    def construct_commands(self, *args) -> dict:
         finale_commands = {}
         for child in self._children:
-            pipe_dict = child.construct_commands()
+            pipe_dict = child.construct_commands(*args)
             finale_commands.update(pipe_dict)
 
         return finale_commands

@@ -1,3 +1,5 @@
+import copy
+
 from .utility.commands import Commands
 from .utility.dragen_utility import (
     fastq_file,
@@ -36,16 +38,19 @@ class BaseDragenCommand(Commands):
 
     def construct_commands(self) -> dict:
         # select the parameter from config template
-        cmd_dict = self.template[self.seq_pipeline]
+        cmd_dict1 = self.template[self.seq_pipeline]
+        cmd_dict2 = copy.deepcopy(cmd_dict1)
         # get the dict that needs to be filled in at runtime
-        param_list = [i for i in cmd_dict if str(cmd_dict[i]).startswith("{")]
+        param_list = [i for i in cmd_dict2 if str(cmd_dict2[i]).startswith("{")]
+        if len(param_list) == 0:
+            raise RuntimeError("Something wrong with parsing template")
         for val in param_list:
             try:
-                cmd_dict[val] = self.arg_registry.get(val)
+                cmd_dict2[val] = self.arg_registry.get(val)
             except KeyError:
                 print(f"missing key {val}: in registry")
                 continue
-        return cmd_dict
+        return cmd_dict2
 
 
 class TumorVariantCommands(Commands):
