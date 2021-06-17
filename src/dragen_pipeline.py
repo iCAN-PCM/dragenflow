@@ -19,7 +19,6 @@ from .utility.flow import Flow
 class ConstructDragenPipeline(Flow):
     def __init__(self):
         self.all_bam_file = {}
-        self.profile = load_json(script_path("dragen_config.json"))["profile1"]
 
     def check_trimming(self, excel: dict, read_trimmer) -> dict:
         trim = trim_options(excel, self.profile)
@@ -40,6 +39,7 @@ class ConstructDragenPipeline(Flow):
         return {**cmd, **trim_cmd}
 
     def constructor(self, excel: dict) -> List[str]:
+        self.profile = load_json(script_path("dragen_config.json"))["profile1"]
         # "N" (or empty), it triggers normal_pipeline_template
         pipeline = excel.get("pipeline_parameters")
         if excel["run_type"] == "germline":
