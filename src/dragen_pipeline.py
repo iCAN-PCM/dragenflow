@@ -19,6 +19,7 @@ from .utility.flow import Flow
 class ConstructDragenPipeline(Flow):
     def __init__(self):
         self.all_bam_file = {}
+        self.profile = None
 
     def check_trimming(self, excel: dict, read_trimmer) -> dict:
         trim = trim_options(excel, self.profile)
