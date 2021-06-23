@@ -9,14 +9,16 @@
             "fastq-file2": "{read2}",
             "RGID": "{rgid}",
             "RGSM": "{rgsm}",
-            "read-trimmers": "polyg",
+            "read-trimmers": "quality,polyg",
+            "trim-min-quality": 3,
             "soft-read-trimmers": "none",
             "enable-sort": "true",
             "enable-duplicate-marking": "true",
             "enable-variant-caller": "true",
+            "vc-enable-joint-detection": "true",
             "enable-sv": "true",
             "enable-cnv": "true",
-            "vc-enable-joint-detection": "true"
+            "cnv-enable-self-normalization": "true"
         },
         "genome_tumor_alignment": {
             "ref-dir": "{refgenome}",
@@ -27,7 +29,8 @@
             "tumor-fastq2": "{read2}",
             "RGID-tumor": "{rgid}",
             "RGSM-tumor": "{rgsm}",
-            "read-trimmers": "polyg",
+            "read-trimmers": "quality,polyg",
+            "trim-min-quality": 3,
             "soft-read-trimmers": "none",
             "enable-sort": "true",
             "enable-duplicate-marking": "true",
