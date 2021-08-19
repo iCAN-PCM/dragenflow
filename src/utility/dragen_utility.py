@@ -8,6 +8,16 @@ from typing import List
 
 
 def custom_sort(val: str) -> float:
+    """Function to sort the sample sheet in particular order
+
+    Pipeline defined in sample sheet need to be ordered first in order so that
+    normal pipelines runs first and then its tumor pipeline. Normal and it paired tumor
+    are marked as N1 and T1 , so to make N1 run ahead of T1 we take the number 1 and
+    minus 0.5. This makes it run ahead of T1 .
+
+    Args:
+        val:
+    """
 
     rank = 0.0
     if len(str(val)) > 1:

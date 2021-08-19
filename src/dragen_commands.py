@@ -11,8 +11,15 @@ from .utility.dragen_utility import (
 
 
 class BaseDragenCommand(Commands):
-    """
-    Base Dragen commands
+    """Class to construct dragen command that is common to all pipeline
+
+    It's a concrete implementation of abstract class commands which
+    implements method `construct_commands`. This constucts the base command
+    Attributes:
+        excel: dict of row from csv file
+        template: json file which has profile for various dragen command
+        seq_pipeline: type of pipeline config to load from template
+        arg_registry: command commands to all seq pipeline
     """
 
     def __init__(self, excel: dict, template: dict, seq_pipeline: str) -> None:
@@ -37,6 +44,11 @@ class BaseDragenCommand(Commands):
         }
 
     def construct_commands(self) -> dict:
+        """Function that constucts the actual command
+
+        Returns:
+            dictionary with dragen cli commands as key value pair
+        """
         # select the parameter from config template
         cmd_dict1 = self.template[self.seq_pipeline]
         cmd_dict2 = copy.deepcopy(cmd_dict1)
@@ -54,14 +66,26 @@ class BaseDragenCommand(Commands):
 
 
 class TumorVariantCommands(Commands):
-    """
-    TumorVariant specific dragen command
+    """Class that created dragen specific command for Tumor variant
+
+    This class is also concrete class of abstract class Commands. This class
+    adds tumor variant specific command on top of base class.Tumor variant needs
+    extra information from previous run of tumor pipeline. This need to be supplied
+    in the form of dictionary
+
+    Attribute:
+        tumor: tumor file prefix
     """
 
     def __init__(self, tumor: dict) -> None:
         self.tumor = tumor
 
     def construct_commands(self) -> dict:
+        """Function that constucts the actual command
+
+        Returns:
+            dictionary with dragen cli commands as key value pair
+        """
 
         cmd_dict = {"tumor-bam-input": f"{self.tumor['output-file-prefix']}_tumor.bam"}
 
@@ -69,8 +93,10 @@ class TumorVariantCommands(Commands):
 
 
 class PairedVariantCommands(Commands):
-    """
-    PairedVariant specific dragen command
+    """Class the creates dragen command for Paired variant
+
+    This class is also concrete class of abstract class Commands. This class
+    adds paired variant specific command on top of base class.
     """
 
     def __init__(self, normal_bam: str, tumor: dict) -> None:
@@ -78,6 +104,11 @@ class PairedVariantCommands(Commands):
         self.normal_bam = normal_bam
 
     def construct_commands(self) -> dict:
+        """Function that constucts the actual command
+
+        Returns:
+            dictionary with dragen cli commands as key value pair
+        """
         cmd_dict = {}
         cmd_dict["bam-input"] = self.normal_bam
         cmd_dict["tumor-bam-input"] = f"{self.tumor['output-file-prefix']}_tumor.bam"

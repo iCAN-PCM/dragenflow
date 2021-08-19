@@ -1,9 +1,15 @@
+"""
+main.py
+=====================================
+Public interface of dragenflow project
+"""
+
 import argparse
 import logging
 from typing import List
 
-from src.utility.flow import FlowConstructor
 from src.dragen_pipeline import ConstructDragenPipeline
+from src.utility.flow import FlowConstructor
 from src.utility.dragen_utility import (
     basic_reader,
     create_fastq_dir,
@@ -25,11 +31,18 @@ class HandleFlow(object):
     """
 
     def parse_file(self, path: str, flow: str) -> List[dict]:
-        """Read excel file(sample sheet)
+        """Read excel file(sample sheet) in csv
 
-        if flow/pipeline is is dragen sort based on col tumor/normal
+        if flow/pipeline is dragen sort based on column 'tumor/normal'
         else just read the csv file. Mehtod returns list of dictionary
         with column name as key and value as row.
+
+        Args:
+            path: excel file (sample sheet)
+            flow: flow to use (at the moment no other implementation than dragen)
+        Returns:
+            rows in excels file as list of dictionaries
+
         """
         if flow == "dragen":
             data_file = file_parse(path)
@@ -45,11 +58,19 @@ class HandleFlow(object):
         bash_cmd: str = "echo",
         dry_run: bool = False,
     ) -> list:
-        """
-        Construct bash command as string and execute if dry_run is False
+        """Construct bash command as string and execute if dry_run is False
 
         This creates appropriate flow object from argument supplied from cli
         & invoke construct_flow method of flow object
+
+        Args:
+            path: path to the samplesheet
+            pipeline: name of the pipeline to use
+            bash_cmd: name of the bash command to use
+            dry_run: enable/disable dry run
+        Returns:
+            List of bash cmd if dry run is enabled else return code of command & stdout
+
         """
         logging.info(f"dry run mode: {dry_run}")
         outputs = []

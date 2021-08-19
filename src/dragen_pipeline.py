@@ -1,3 +1,9 @@
+"""
+dragen_pipeline.py
+==================
+pipeline logic
+"""
+
 import logging
 from typing import List
 
@@ -17,11 +23,31 @@ from .utility.flow import Flow
 
 
 class ConstructDragenPipeline(Flow):
+    """Class that constructs dragen commands
+
+    Concrete class of abstract class Flow which implements a concrete "constructor"
+    method and other helper methods.
+    Attributes:
+        all_bam_file (dict): dictionary of bam file where key is project_id+sample_id
+         and value is path to bam file
+        profile (str): profile to load, path to json file with defaults for dragen
+         commands(dragen_config.json)
+    """
+
     def __init__(self):
         self.all_bam_file = {}
         self.profile = None
 
-    def check_trimming(self, excel: dict, read_trimmer) -> dict:
+    def check_trimming(self, excel: dict, read_trimmer: str) -> dict:
+        """Check and set appropriate trimming options
+
+        Args:
+            excel: row from sample sheet(csv file) as dictionary
+            read_trimmer: read_trimmer option (loaded from profile if given)
+        Returns:
+            dict with dragen read trimmer options if trimmer option is set on
+            sample sheet else empty dict
+        """
         trim = trim_options(excel, self.profile)
         cmd = {}
         cmd["read-trimmers"] = read_trimmer
@@ -32,6 +58,14 @@ class ConstructDragenPipeline(Flow):
         return cmd
 
     def command_with_trim(self, excel: dict, pipe_elem: str) -> dict:
+        """Add trimmer commands if its present in excel or in profile
+
+        Args:
+            excel: row from sample sheet(csv file) as dictionary
+            pipe_elem: variant_call, normal_pipeline, tumor_alignment
+        Returns:
+            dicts with dragen commands as key value with added trimmer option
+        """
         pipeline = excel.get("pipeline_parameters")
         base_cmd = BaseDragenCommand(excel, self.profile, f"{pipeline}_{pipe_elem}")
         cmd = base_cmd.construct_commands()
@@ -40,6 +74,14 @@ class ConstructDragenPipeline(Flow):
         return {**cmd, **trim_cmd}
 
     def constructor(self, excel: dict) -> List[str]:
+        """Method that constructs the dragen commands
+
+        Args:
+            excel: dict that contains row from excel file(csv)
+        Returns:
+            List of string formatted dragen commands
+        """
+
         self.profile = load_json(script_path("dragen_config.json"))["profile1"]
         # "N" (or empty), it triggers normal_pipeline_template
         pipeline = excel.get("pipeline_parameters")
