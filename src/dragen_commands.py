@@ -7,6 +7,7 @@ from .utility.dragen_utility import (
     set_fileprefix,
     set_rgid,
     set_rgism,
+    SH_TARGET,
 )
 
 
@@ -25,7 +26,7 @@ class BaseDragenCommand(Commands):
             "tumor-fastq1": fastq_file(self.excel, 1),
             "tumor-fastq2": fastq_file(self.excel, 2),
             "output-file-prefix": set_fileprefix(self.excel),
-            "qc-coverage-region-1": self.excel["TargetRegions"],
+            "qc-coverage-region-1": self.excel[SH_TARGET],
             "ref-dir": get_ref(self.excel, self.template),
             "RGID": set_rgid(self.excel),
             "RGSM": set_rgism(self.excel),
@@ -51,6 +52,15 @@ class BaseDragenCommand(Commands):
                 print(f"missing key {val}: in registry")
                 continue
         return cmd_dict2
+
+    def set_umi_fastq(self, excel: dict, is_tumor: bool = False) -> None:
+        if is_tumor:
+            self.arg_registry["tumor-fastq2"] = fastq_file(self.excel, 3)
+        else:
+            self.arg_registry["fastq-file2"] = fastq_file(self.excel, 3)
+        self.arg_registry["umi-fastq"] = fastq_file(self.excel, 2, False)
+        self.arg_registry["umi-metrics-interval-file"] = excel[SH_TARGET]
+        return
 
 
 class TumorVariantCommands(Commands):

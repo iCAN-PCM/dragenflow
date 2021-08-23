@@ -10,6 +10,7 @@ from src.utility.dragen_utility import (
     load_json,
     run_type,
     set_rgism,
+    SHA_RTYPE,
     trim_options,
 )
 
@@ -61,6 +62,7 @@ def excel_dict():
         "dry_run": False,
         "row_index": 2,
         "Sample_Project": "test_project",
+        "_run_type": "test",
     }
     return data
 
@@ -152,7 +154,8 @@ def test_run_type(excel_dict, Is_tumor, expected, matching_normal_sample):
     excel_dict["Is_tumor"] = Is_tumor
     excel_dict["matching_normal_sample"] = matching_normal_sample
     returned_excel = run_type([excel_dict])
-    assert returned_excel[0]["run_type"] == expected
+    print(returned_excel)
+    assert returned_excel[0][SHA_RTYPE] == expected
 
 
 @pytest.mark.parametrize(

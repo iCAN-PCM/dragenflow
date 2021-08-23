@@ -6,6 +6,10 @@ from pathlib import Path
 import shutil
 from typing import List
 
+# values for the samplesheet columns, SH_ for ones in file, SHA_ for added constructs
+SHA_RTYPE = "_run_type"
+SH_TARGET = "TargetRegions"
+
 
 def custom_sort(val: str) -> float:
 
@@ -203,14 +207,14 @@ def run_type(excel: List[dict]) -> List[dict]:
             or dt["Is_tumor"] == ""
             or dt["Is_tumor"].lower() == "no"
         ):
-            dt["run_type"] = "germline"
+            dt[SHA_RTYPE] = "germline"
         elif len(dt["Is_tumor"]) >= 1 and dt["matching_normal_sample"] == "":
-            dt["run_type"] = "somatic_single"
+            dt[SHA_RTYPE] = "somatic_single"
         elif len(dt["Is_tumor"]) >= 1 and dt["matching_normal_sample"] != "":
             sample_id = dt["matching_normal_sample"]
             sample_project = dt["Sample_Project"]
             if check_sample(excel, sample_id, sample_project):
-                dt["run_type"] = "somatic_paired"
+                dt[SHA_RTYPE] = "somatic_paired"
             else:
                 raise RuntimeError(
                     f"sample id {sample_id} doesn't exist at {dt['row_index']}"
@@ -230,7 +234,7 @@ def check_sample(excel: List[dict], sample_id: str, sample_project: str) -> bool
     return False
 
 
-def sort_list(excel: List[dict], sorting_col: str = "run_type") -> List[dict]:
+def sort_list(excel: List[dict], sorting_col: str = SHA_RTYPE) -> List[dict]:
     sorted_list = sorted(
         excel,
         key=lambda row: 1 if row[sorting_col] == "germline" else 0,

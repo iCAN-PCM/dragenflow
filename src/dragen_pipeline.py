@@ -1,16 +1,17 @@
 import logging
-from typing import List
+from typing import List, Optional
 
 from .dragen_commands import (
     BaseDragenCommand,
     PairedVariantCommands,
-    TumorVariantCommands,
 )
 from .utility.commands import CompositeCommands
 from .utility.dragen_utility import (
     dragen_cli,
     load_json,
     script_path,
+    SH_TARGET,
+    SHA_RTYPE,
     trim_options,
 )
 from .utility.flow import Flow
@@ -39,15 +40,30 @@ class ConstructDragenPipeline(Flow):
 
         return {**cmd, **trim_cmd}
 
-    def constructor(self, excel: dict) -> List[str]:
+    def constructor(self, excel: dict) -> Optional[List[str]]:
         self.profile = load_json(script_path("dragen_config.json"))["profile1"]
-        # "N" (or empty), it triggers normal_pipeline_template
-        pipeline = excel.get("pipeline_parameters")
-        if excel["run_type"] == "germline":
+        # no pipeline set, check if target to choose between exome and genome
+        if not excel["pipeline_parameters"]:
+            if excel[SH_TARGET]:
+                excel["pipeline_parameters"] = "exome"
+            else:
+                excel["pipeline_parameters"] = "genome"
+        pipeline = excel["pipeline_parameters"]
+
+        if excel[SHA_RTYPE] == "germline":
             # out put prefix = samplename
             # out put prefix paired = sample.s
-            logging.info(f"{excel.get('run_type')}: executing normal_pipeline")
-            cmd_d = self.command_with_trim(excel, "normal_pipeline")
+            if pipeline.startswith("umi"):
+                logging.info(f"{excel[SHA_RTYPE]}: executing umi normal_pipeline")
+                pipeline = excel.get("pipeline_parameters")
+                cmd_base = BaseDragenCommand(
+                    excel, self.profile, f"{pipeline}_normal_pipeline"
+                )
+                cmd_base.set_umi_fastq(excel, False)
+                cmd_d = cmd_base.construct_commands()
+            else:
+                logging.info(f"{excel[SHA_RTYPE]}: executing normal_pipeline")
+                cmd_d = self.command_with_trim(excel, "normal_pipeline")
             # store bam file
             self.all_bam_file[
                 f"{excel['Sample_Project']}/{excel['SampleID']}"
@@ -55,49 +71,53 @@ class ConstructDragenPipeline(Flow):
             final_str = dragen_cli(cmd_d, excel)
             return [final_str]
 
-        #  if it's "T" => step 1 run tumor alignment
-        #                 step 2 run tumor variant call
-        elif excel["run_type"] == "somatic_single":
-            logging.info(f"{excel.get('run_type')}:preparing tumor alignment template")
-            arg_strings = []
-            # step 1
-            cmd_d1 = self.command_with_trim(excel, "tumor_alignment")
-            final_str1 = dragen_cli(cmd_d1, excel, "alignment")
-            arg_strings.append(final_str1)
-            # step 2: prepare tumor_variant_call_template
-            # define tumor bam input => outputfile-prefix.bam (from previous run)
-            logging.info("preparing tumor variant call template")
-            cmd_d2 = CompositeCommands()
-            base_cmd = BaseDragenCommand(
-                excel, self.profile, f"{pipeline}_tumor_variant_call"
-            )
-            tv_cmd = TumorVariantCommands(tumor=cmd_d1)
-            cmd_d2.add(base_cmd)
-            cmd_d2.add(tv_cmd)
-            final_str2 = dragen_cli(cmd_d2.construct_commands(), excel, "analysis")
-            arg_strings.append(final_str2)
-            return arg_strings
+        elif excel[SHA_RTYPE] == "somatic_single":
+            if pipeline.startswith("umi"):
+                logging.info(f"{excel[SHA_RTYPE]}: executing umi tumor_pipeline")
+                pipeline = excel.get("pipeline_parameters")
+                cmd_base = BaseDragenCommand(
+                    excel, self.profile, f"{pipeline}_tumor_pipeline"
+                )
+                cmd_base.set_umi_fastq(excel, True)
+                cmd_d = cmd_base.construct_commands()
+            else:
+                logging.info(f"{excel[SHA_RTYPE]}: executing tumor_pipeline")
+                cmd_d = self.command_with_trim(excel, "tumor_pipeline")
+            final_str = dragen_cli(cmd_d, excel)
+            return [final_str]
 
-        # if it's T1 => step 1  run tumor alignment
-        #               step 2 paired variant calls
-        elif excel["run_type"] == "somatic_paired":
-            logging.info(
-                f"{excel.get('run_type')}:: preparing tumor alignment template"
-            )
-            # step 1 tumor alignment
+        elif excel[SHA_RTYPE] == "somatic_paired":
             arg_string = []
-            cmd_d1 = self.command_with_trim(excel, "tumor_alignment")
-            final_str1 = dragen_cli(cmd_d1, excel, "alignment")
-            arg_string.append(final_str1)
-
-            # step 2 paired variant call
-            logging.info(
-                f"{excel.get('run_type')}:: preparing paired varaint call template"
-            )
-            cmd_d2 = CompositeCommands()
             base_cmd = BaseDragenCommand(
                 excel, self.profile, f"{pipeline}_paired_variant_call"
             )
+            cmd_d2 = CompositeCommands()
+            if pipeline.startswith("umi"):
+                # step 1
+                logging.info(f"{excel[SHA_RTYPE]}: preparing umi alignment template")
+                pipeline = excel.get("pipeline_parameters")
+                cmd_base = BaseDragenCommand(
+                    excel, self.profile, f"{pipeline}_tumor_alignment"
+                )
+                cmd_base.set_umi_fastq(excel, True)
+                cmd_d1 = cmd_base.construct_commands()
+                final_str1 = dragen_cli(cmd_d1, excel, "alignment")
+                arg_string.append(final_str1)
+                # step 2
+                logging.info(
+                    f"{excel[SHA_RTYPE]}: preparing umi paired variant call template"
+                )
+            else:
+                logging.info(f"{excel[SHA_RTYPE]}: preparing tumor alignment template")
+                # step 1 tumor alignment
+                cmd_d1 = self.command_with_trim(excel, "tumor_alignment")
+                final_str1 = dragen_cli(cmd_d1, excel, "alignment")
+                arg_string.append(final_str1)
+
+                # step 2 paired variant call
+                logging.info(
+                    f"{excel[SHA_RTYPE]}: preparing paired variant call template"
+                )
             bam_file_key = (
                 f"{excel['Sample_Project']}/{excel['matching_normal_sample']}"
             )
@@ -107,12 +127,9 @@ class ConstructDragenPipeline(Flow):
             final_str2 = dragen_cli(cmd_d2.construct_commands(), excel, "analysis")
             arg_string.append(final_str2)
             return arg_string
+
         else:
             logging.info(
-                f"{excel.get('run_type')}, You shouldn't be here No pipeline info: \
-                executing by default normal_pipeline"
+                f"No known pipeline run type, problem on \
+                    {excel['Sample_Project']}:{excel.get('SampleID')}, skipping"
             )
-            final_str = dragen_cli(
-                self.command_with_trim(excel, "normal_pipeline"), excel
-            )
-            return [final_str]

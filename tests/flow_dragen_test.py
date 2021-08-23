@@ -18,7 +18,7 @@ def excel_dict():
         "Lane": 1,
         "dry_run": False,
         "row_index": 2,
-        "run_type": "germline",
+        "_run_type": "germline",
     }
     return data
 
@@ -69,8 +69,9 @@ def test_dragen_tumor(dragen_flow, excel_dict):
     dragen = dragen_flow
     excel_dict["run_type"] = "somatic_single"
     dragen_cmd = dragen.constructor(excel_dict)
+    print(dragen_cmd)
     assert type(dragen_cmd) == list
-    assert len(dragen_cmd) == 2
+    assert len(dragen_cmd) == 1
     assert "{" not in str(dragen_cmd[0])
 
 
@@ -95,9 +96,8 @@ def test_dragen_normal_tumor2(dragen_flow, excel_dict):
     excel_dict["matching_normal_sample"] = "test_sampleID"
     dragen_cmd = dragen.constructor(excel_dict)
     # print(dragen_cmd.all)
+    print(dragen_cmd)
     assert type(dragen_cmd) == list
-    assert len(dragen_cmd) == 2
+    assert len(dragen_cmd) == 1
     assert type(dragen_cmd[0]) == str
-    assert type(dragen_cmd[1]) == str
     assert "{" not in str(dragen_cmd[0])
-    assert "{" not in str(dragen_cmd[1])
