@@ -10,8 +10,8 @@ from src.utility.dragen_utility import (
     load_json,
     run_type,
     set_rgism,
-    trim_options,
     SHA_RTYPE,
+    trim_options,
 )
 
 

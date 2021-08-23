@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, Optional
 
 from .dragen_commands import (
     BaseDragenCommand,
@@ -10,9 +10,9 @@ from .utility.dragen_utility import (
     dragen_cli,
     load_json,
     script_path,
-    trim_options,
-    SHA_RTYPE,
     SH_TARGET,
+    SHA_RTYPE,
+    trim_options,
 )
 from .utility.flow import Flow
 
@@ -40,7 +40,7 @@ class ConstructDragenPipeline(Flow):
 
         return {**cmd, **trim_cmd}
 
-    def constructor(self, excel: dict) -> List[str]:
+    def constructor(self, excel: dict) -> Optional[List[str]]:
         self.profile = load_json(script_path("dragen_config.json"))["profile1"]
         # no pipeline set, check if target to choose between exome and genome
         if not excel["pipeline_parameters"]:
@@ -48,7 +48,7 @@ class ConstructDragenPipeline(Flow):
                 excel["pipeline_parameters"] = "exome"
             else:
                 excel["pipeline_parameters"] = "genome"
-        pipeline = excel.get("pipeline_parameters")
+        pipeline = excel["pipeline_parameters"]
 
         if excel[SHA_RTYPE] == "germline":
             # out put prefix = samplename
