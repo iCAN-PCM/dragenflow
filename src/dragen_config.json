@@ -422,6 +422,10 @@
         "adapters": {
             "truseq": "/fas/NGS/pipes/dragen/configs/adapters/truseq.fasta",
             "nextera": "/fas/NGS/pipes/dragen/configs/adapters/nextera.fasta"
+        },
+        "scripts" : {
+            "pre": "path to script",
+            "post": "path to script"
         }
     }
 }

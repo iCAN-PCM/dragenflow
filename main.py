@@ -44,6 +44,7 @@ class HandleFlow(object):
         pipeline: str = "dragen",
         bash_cmd: str = "echo",
         dry_run: bool = False,
+        enable_scripts: bool = False,
     ) -> list:
         """
         Construct bash command as string and execute if dry_run is False
@@ -67,6 +68,8 @@ class HandleFlow(object):
                 # skip if pipeline is not dragen
                 if data["pipeline"].lower() != "dragen":
                     continue
+                # attach script to data
+                data["enable_scripts"] = enable_scripts
                 logging.info("Creating dragen commands")
                 constructed_str = flow_context.construct_flow(data=data)
                 # collect all executable command in a list
@@ -101,8 +104,14 @@ if __name__ == "__main__":
     parser.add_argument(
         "-p", "--path", type=str, action="store", required=True, nargs=1
     )
+    parser.add_argument("-s", "--script", default=False, action="store_true")
     parser.add_argument("-d", "--dryrun", default=False, action="store_true")
     parser.add_argument("-c", "--cmd", default=None)
     args = parser.parse_args()
     handle = HandleFlow()
-    handle.execute_bash(path=args.path[0], bash_cmd=args.cmd, dry_run=args.dryrun)
+    handle.execute_bash(
+        path=args.path[0],
+        bash_cmd=args.cmd,
+        dry_run=args.dryrun,
+        enable_scripts=args.script,
+    )

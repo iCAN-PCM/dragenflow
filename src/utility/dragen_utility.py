@@ -4,7 +4,7 @@ import json
 import os
 from pathlib import Path
 import shutil
-from typing import List
+from typing import List, Optional
 
 # values for the samplesheet columns, SH_ for ones in file, SHA_ for added constructs
 SHA_RTYPE = "_run_type"
@@ -121,11 +121,16 @@ def check_key(dct: dict, k: str, val: str) -> dict:
         raise KeyError
 
 
-def dragen_cli(cmd: dict, excel: dict, postf: str = "") -> str:
+def dragen_cli(
+    cmd: dict, excel: dict, postf: str = "", scripts: Optional[dict] = None
+) -> str:
     default_str = " ".join(f"--{key} {val}" for (key, val) in cmd.items())
     if postf:
-        postf = "-" + postf
-    final_str = f"grun.py -n dragen-{excel['Sample_Name']}{postf} -L logs -q  dragen.q -c 'dragen {default_str}'"  # noqa: E501, B950
+        postf = f"- {postf}"
+    if scripts:
+        final_str = f"grun.py -n dragen-{excel['Sample_Name']}{postf} -L logs -q  dragen.q -c '{scripts['pre']}'\n 'dragen {default_str}'\n '{scripts['post']}' "  # noqa: E501, B950
+    else:
+        final_str = f"grun.py -n dragen-{excel['Sample_Name']}{postf} -L logs -q  dragen.q -c 'dragen {default_str}'"  # noqa: E501, B950
     return final_str
 
 

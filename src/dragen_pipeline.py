@@ -42,6 +42,11 @@ class ConstructDragenPipeline(Flow):
 
     def constructor(self, excel: dict) -> Optional[List[str]]:
         self.profile = load_json(script_path("dragen_config.json"))["profile1"]
+        # load pre and post scripts
+        scripts = None
+        if excel.get("enable_scripts"):
+            scripts = self.profile.get("scripts")
+
         # no pipeline set, check if target to choose between exome and genome
         if not excel["pipeline_parameters"]:
             if excel[SH_TARGET]:
@@ -68,7 +73,7 @@ class ConstructDragenPipeline(Flow):
             self.all_bam_file[
                 f"{excel['Sample_Project']}/{excel['SampleID']}"
             ] = f"../{excel['SampleID']}/{cmd_d['output-file-prefix']}.bam"
-            final_str = dragen_cli(cmd_d, excel)
+            final_str = dragen_cli(cmd_d, excel, scripts)
             return [final_str]
 
         elif excel[SHA_RTYPE] == "somatic_single":
@@ -83,7 +88,7 @@ class ConstructDragenPipeline(Flow):
             else:
                 logging.info(f"{excel[SHA_RTYPE]}: executing tumor_pipeline")
                 cmd_d = self.command_with_trim(excel, "tumor_pipeline")
-            final_str = dragen_cli(cmd_d, excel)
+            final_str = dragen_cli(cmd_d, excel, scripts)
             return [final_str]
 
         elif excel[SHA_RTYPE] == "somatic_paired":
@@ -101,7 +106,7 @@ class ConstructDragenPipeline(Flow):
                 )
                 cmd_base.set_umi_fastq(excel, True)
                 cmd_d1 = cmd_base.construct_commands()
-                final_str1 = dragen_cli(cmd_d1, excel, "alignment")
+                final_str1 = dragen_cli(cmd_d1, excel, "alignment", scripts)
                 arg_string.append(final_str1)
                 # step 2
                 logging.info(
@@ -111,7 +116,7 @@ class ConstructDragenPipeline(Flow):
                 logging.info(f"{excel[SHA_RTYPE]}: preparing tumor alignment template")
                 # step 1 tumor alignment
                 cmd_d1 = self.command_with_trim(excel, "tumor_alignment")
-                final_str1 = dragen_cli(cmd_d1, excel, "alignment")
+                final_str1 = dragen_cli(cmd_d1, excel, "alignment", scripts)
                 arg_string.append(final_str1)
 
                 # step 2 paired variant call
@@ -124,7 +129,9 @@ class ConstructDragenPipeline(Flow):
             pv_cmd = PairedVariantCommands(self.all_bam_file[bam_file_key], cmd_d1)
             cmd_d2.add(base_cmd)
             cmd_d2.add(pv_cmd)
-            final_str2 = dragen_cli(cmd_d2.construct_commands(), excel, "analysis")
+            final_str2 = dragen_cli(
+                cmd_d2.construct_commands(), excel, "analysis", scripts
+            )
             arg_string.append(final_str2)
             return arg_string
 
