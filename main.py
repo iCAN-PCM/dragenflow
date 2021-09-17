@@ -44,7 +44,7 @@ class HandleFlow(object):
         pipeline: str = "dragen",
         bash_cmd: str = "echo",
         dry_run: bool = False,
-        enable_scripts: bool = False,
+        disable_scripts: bool = False,
     ) -> list:
         """
         Construct bash command as string and execute if dry_run is False
@@ -69,7 +69,7 @@ class HandleFlow(object):
                 if data["pipeline"].lower() != "dragen":
                     continue
                 # attach script to data
-                data["enable_scripts"] = enable_scripts
+                data["disable_scripts"] = disable_scripts
                 logging.info("Creating dragen commands")
                 constructed_str = flow_context.construct_flow(data=data)
                 # collect all executable command in a list
@@ -99,19 +99,42 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
         prog="dragenflow",
-        description="Process given samplesheet and turn into dragen commands.",
+        description="Given a samplesheet, turn it into dragen commands.",
     )
     parser.add_argument(
-        "-p", "--path", type=str, action="store", required=True, nargs=1
+        "-p",
+        "--path",
+        type=str,
+        action="store",
+        required=True,
+        nargs=1,
+        help="Required: path to the samplesheet file",
     )
-    parser.add_argument("-s", "--script", default=False, action="store_true")
-    parser.add_argument("-d", "--dryrun", default=False, action="store_true")
-    parser.add_argument("-c", "--cmd", default=None)
+    parser.add_argument(
+        "-ds",
+        "--disable_script",
+        default=False,
+        action="store_true",
+        help="Optional: disable execution of pre/post script, defaults to True",
+    )
+    parser.add_argument(
+        "-d",
+        "--dryrun",
+        default=False,
+        action="store_true",
+        help="Optional: enable dryrun, defaults to False",
+    )
+    parser.add_argument(
+        "-c",
+        "--cmd",
+        default=None,
+        help="Optional: if need to run arbitrary bash command, default None",
+    )
     args = parser.parse_args()
     handle = HandleFlow()
     handle.execute_bash(
         path=args.path[0],
         bash_cmd=args.cmd,
         dry_run=args.dryrun,
-        enable_scripts=args.script,
+        disable_scripts=args.disable_script,
     )
