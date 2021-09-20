@@ -6,7 +6,7 @@ from src.dragen_pipeline import ConstructDragenPipeline
 @pytest.fixture
 def excel_dict():
     data = {
-        "TargetRegions": "some/path",
+        "TargetRegions": "pan_cancer",
         "Index": "TTGATCCG",
         "RefGenome": "GRCh38",
         "SampleID": "test_sampleID",
