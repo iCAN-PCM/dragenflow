@@ -7,11 +7,13 @@ from .dragen_commands import (
 )
 from .utility.commands import CompositeCommands
 from .utility.dragen_utility import (
+    check_target,
     dragen_cli,
     load_json,
     script_path,
     SH_TARGET,
     SHA_RTYPE,
+    SHA_TRG_NAME,
     trim_options,
 )
 from .utility.flow import Flow
@@ -32,10 +34,19 @@ class ConstructDragenPipeline(Flow):
             cmd["trim-adapter-read2"] = trim
         return cmd
 
+    def add_cnv(self, excel: dict, cmd: dict):
+        tmp = self.profile["ref_parameters"]["target"]
+        if excel[SHA_TRG_NAME] in tmp[excel["RefGenome"]]:
+            cmd["cnv-normals-list"] = tmp[excel["RefGenome"]][excel[SHA_TRG_NAME]]
+            cmd["cnv-target-bed"] = excel[SH_TARGET]
+            cmd["enable-cnv"] = "true"
+
     def command_with_trim(self, excel: dict, pipe_elem: str) -> dict:
         pipeline = excel.get("pipeline_parameters")
         base_cmd = BaseDragenCommand(excel, self.profile, f"{pipeline}_{pipe_elem}")
         cmd = base_cmd.construct_commands()
+        if SHA_TRG_NAME in excel and excel[SHA_TRG_NAME]:
+            self.add_cnv(excel, cmd)
         trim_cmd = self.check_trimming(excel, cmd.get("read-trimmers"))
 
         return {**cmd, **trim_cmd}
@@ -46,6 +57,10 @@ class ConstructDragenPipeline(Flow):
         scripts = self.profile.get("scripts")
         if excel.get("disable_scripts"):
             scripts = None
+        # make sure target gets set if given a named target
+        check_target(
+            excel, self.profile["ref_parameters"]["target"][excel["RefGenome"]]
+        )
 
         # no pipeline set, check if target to choose between exome and genome
         if not excel["pipeline_parameters"]:

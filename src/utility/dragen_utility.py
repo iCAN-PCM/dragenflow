@@ -8,6 +8,7 @@ from typing import List, Optional
 
 # values for the samplesheet columns, SH_ for ones in file, SHA_ for added constructs
 SHA_RTYPE = "_run_type"
+SHA_TRG_NAME = "_target_name"
 SH_TARGET = "TargetRegions"
 
 
@@ -229,6 +230,18 @@ def run_type(excel: List[dict]) -> List[dict]:
         else:
             raise ValueError(f"invalid entry at index {dt['row_index']}")
     return excel
+
+
+def check_target(excel: dict, targets: dict) -> None:
+    if not excel[SH_TARGET]:
+        return
+    if excel[SH_TARGET].startswith("/"):
+        return
+    if not targets[excel[SH_TARGET]]:
+        raise ValueError(f"{SH_TARGET} value {excel[SH_TARGET]} not in json.")
+    real_target = targets[excel[SH_TARGET]]
+    excel[SHA_TRG_NAME] = excel[SH_TARGET]
+    excel[SH_TARGET] = real_target
 
 
 def check_sample(excel: List[dict], sample_id: str, sample_project: str) -> bool:

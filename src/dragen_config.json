@@ -416,8 +416,19 @@
                     "ref-dir": "/staging/human/reference/hg38/uscs/hg38.fa.k_21.f_16.m_149_cnv"
                 }
             },
+            "target": {
+                "GRCh38": {
+                    "finwes": "/fas/NGS/pipes/dragen/configs/targets/FINWES_targets_0001515.bed",
+                    "twist_comprehensive": "/fas/NGS/pipes/dragen/configs/targets/Twist_Core_Exome_RefSeq_targets_hg38.bed",
+                    "pan_cancer": "/fas/NGS/pipes/dragen/configs/targets/FIMM_pan_cancer_panel_hg38.bed"
+                }
+            },
             "noiseprofile": "/fas/NGS/pipes/dragen/configs/noise_profile/WGS_hg38_v1.0_systematic_noise.bed",
-            "cnvpanelofnormals": "'put CNV PoN here'"
+            "cnvpanelofnormals": {
+                "GRCh38": {
+                    "twist_comprehensive": "/fas/NGS/pipes/dragen/configs/cnv_pon/hg38_twist_core_refseq.txt"
+                }
+            }
         },
         "adapters": {
             "truseq": "/fas/NGS/pipes/dragen/configs/adapters/truseq.fasta",
