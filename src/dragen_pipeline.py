@@ -35,7 +35,7 @@ class ConstructDragenPipeline(Flow):
         return cmd
 
     def add_cnv(self, excel: dict, cmd: dict):
-        tmp = self.profile["ref_parameters"]["target"]
+        tmp = self.profile["ref_parameters"]["cnvpanelofnormals"]
         if excel[SHA_TRG_NAME] in tmp[excel["RefGenome"]]:
             cmd["cnv-normals-list"] = tmp[excel["RefGenome"]][excel[SHA_TRG_NAME]]
             cmd["cnv-target-bed"] = excel[SH_TARGET]
@@ -45,8 +45,6 @@ class ConstructDragenPipeline(Flow):
         pipeline = excel.get("pipeline_parameters")
         base_cmd = BaseDragenCommand(excel, self.profile, f"{pipeline}_{pipe_elem}")
         cmd = base_cmd.construct_commands()
-        if SHA_TRG_NAME in excel and excel[SHA_TRG_NAME]:
-            self.add_cnv(excel, cmd)
         trim_cmd = self.check_trimming(excel, cmd.get("read-trimmers"))
 
         return {**cmd, **trim_cmd}
@@ -84,6 +82,8 @@ class ConstructDragenPipeline(Flow):
             else:
                 logging.info(f"{excel[SHA_RTYPE]}: executing normal_pipeline")
                 cmd_d = self.command_with_trim(excel, "normal_pipeline")
+                if SHA_TRG_NAME in excel and excel[SHA_TRG_NAME]:
+                    self.add_cnv(excel, cmd_d)
             # store bam file
             self.all_bam_file[
                 f"{excel['Sample_Project']}/{excel['SampleID']}"
@@ -103,6 +103,8 @@ class ConstructDragenPipeline(Flow):
             else:
                 logging.info(f"{excel[SHA_RTYPE]}: executing tumor_pipeline")
                 cmd_d = self.command_with_trim(excel, "tumor_pipeline")
+                if SHA_TRG_NAME in excel and excel[SHA_TRG_NAME]:
+                    self.add_cnv(excel, cmd_d)
             final_str = dragen_cli(cmd=cmd_d, excel=excel, scripts=scripts)
             return [final_str]
 
@@ -125,23 +127,19 @@ class ConstructDragenPipeline(Flow):
                     cmd=cmd_d1, excel=excel, postf="alignment", scripts=scripts
                 )
                 arg_string.append(final_str1)
-                # step 2
-                logging.info(
-                    f"{excel[SHA_RTYPE]}: preparing umi paired variant call template"
-                )
             else:
                 logging.info(f"{excel[SHA_RTYPE]}: preparing tumor alignment template")
                 # step 1 tumor alignment
                 cmd_d1 = self.command_with_trim(excel, "tumor_alignment")
+                if SHA_TRG_NAME in excel and excel[SHA_TRG_NAME]:
+                    self.add_cnv(excel, cmd_d1)
+                    cmd_d1["enable-map-align-output"] = "true"
                 final_str1 = dragen_cli(
                     cmd=cmd_d1, excel=excel, postf="alignment", scripts=scripts
                 )
                 arg_string.append(final_str1)
-
-                # step 2 paired variant call
-                logging.info(
-                    f"{excel[SHA_RTYPE]}: preparing paired variant call template"
-                )
+            # step 2 paired variant call
+            logging.info(f"{excel[SHA_RTYPE]}: preparing paired variant call template")
             bam_file_key = (
                 f"{excel['Sample_Project']}/{excel['matching_normal_sample']}"
             )
