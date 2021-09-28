@@ -410,6 +410,26 @@
             "sv-exome": "true",
             "qc-coverage-region-1": "{TargetRegions}"
         },
+        "rna": {
+            "ref-dir": "{refgenome}",
+            "intermediate-results-dir": "{staging}",
+            "output-directory": ".",
+            "output-file-prefix": "{outprefix}",
+            "fastq-file1": "{read1}",
+            "fastq-file2": "{read2}",
+            "RGID": "{rgid}",
+            "RGSM": "{rgsm}",
+            "enable-map-align-output": "true",
+            "read-trimmers": "quality,polyg",
+            "trim-min-quality": 3,
+            "enable-sort": "true",
+            "enable-duplicate-marking": "true",
+            "enable-variant-caller": "true",
+            "annotation-file": "path to gtf file",
+            "enable-rna-quantification": "true",
+            "rna-quantification-gc-bias": "true",
+            "enable-rna-gene-fusion": "true"
+        },
         "ref_parameters": {
             "RefGenome": {
                 "GRCh38": {

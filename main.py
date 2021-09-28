@@ -4,6 +4,7 @@ from typing import List
 
 from src.utility.flow import FlowConstructor
 from src.dragen_pipeline import ConstructDragenPipeline
+from src.dragen_rna_pipeline import ConstructRnaPipeline
 from src.utility.dragen_utility import (
     basic_reader,
     create_fastq_dir,
@@ -13,7 +14,10 @@ from src.utility.dragen_utility import (
 )
 
 # register flows/pipeline
-available_pipeline = {"dragen": ConstructDragenPipeline()}
+available_pipeline = {
+    "dragen_dna": ConstructDragenPipeline(),
+    "dragen_rna": ConstructRnaPipeline(),
+}
 
 logging.basicConfig(filename="app.log", filemode="w", level=logging.DEBUG)
 logging.info("started new logging session")
@@ -61,13 +65,19 @@ class HandleFlow(object):
         logging.info("assigning runtype")
         data_file1 = run_type(data_file)
         data_file = sort_list(data_file1)
-        chosen_pipeline = available_pipeline.get(pipeline)
-        flow_context = FlowConstructor(chosen_pipeline)
+        # chosen_pipeline = available_pipeline[pipeline]
+        # flow_context = FlowConstructor(chosen_pipeline)
         for data in data_file:
-            if available_pipeline.get(pipeline):
+            if data["pipeline"].lower() == "dragen":
+                if data["pipeline_parameters"].lower() == "rna":
+                    pipeline = "dragen_rna"
+                    logging.info("Preparing dragen rna pipeline \x1b[31;1m")
+                else:
+                    pipeline = "dragen_dna"
+                    logging.info("Preparing dragen dna pipeline \x1b[31;1m")
+                chosen_pipeline = available_pipeline[pipeline]
+                flow_context = FlowConstructor(chosen_pipeline)
                 # skip if pipeline is not dragen
-                if data["pipeline"].lower() != "dragen":
-                    continue
                 # attach script to data
                 data["disable_scripts"] = disable_scripts
                 logging.info("Creating dragen commands")

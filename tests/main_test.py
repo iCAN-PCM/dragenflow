@@ -14,7 +14,7 @@ def test_parse_file(get_handle):
     )
     assert type(list_dict) == list
     # check for number of rows in the excel file its 12 row
-    assert len(list_dict) == 12
+    assert len(list_dict) == 13
     assert "file_path" in list_dict[0].keys()
     # index of first germline in test samplesheet
     assert list_dict[1]["row_index"] == 3
@@ -27,7 +27,7 @@ def test_execute_bash(get_handle):
         dry_run=False,
     )
     print(f"len of : {len(list_str)}")
-    assert len(list_str) == 16
+    assert len(list_str) == 17
     for val in list_str:
         if type(val[0]) == int:
             assert val[0] == 0
@@ -44,7 +44,7 @@ def test_construct_str(get_handle):
     with open("test1.txt", "w") as f:
         for val in list_str:
             f.write(f"{val} \n")
-    assert len(list_str) == 16
+    assert len(list_str) == 17
     for val in list_str:
         assert type(val) == str
         assert "{" not in val
