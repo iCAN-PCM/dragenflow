@@ -12,18 +12,6 @@ SHA_TRG_NAME = "_target_name"
 SH_TARGET = "TargetRegions"
 
 
-def custom_sort(val: str) -> float:
-
-    rank = 0.0
-    if len(str(val)) > 1:
-        if val[0] == "N":
-            rank = float(val[-1]) - 0.5
-        if val[0] == "T":
-            rank = float(val[-1])
-
-    return rank
-
-
 def script_path(filename: str) -> str:
     """
     A convenience function to get the absolute path to a file in this
@@ -68,15 +56,14 @@ def set_rgism(excel: dict) -> str:
 
 def create_fastq_dir(excel: list, dry_run: bool = False) -> List[dict]:
     for row in excel:
-        if row["pipeline"].lower() != "dragen":
-            continue
-        path = Path(row["file_path"]).absolute()
-        sample_id = row["SampleID"] if row.get("SampleID") else row["Sample_ID"]
-        new_path = path.parent / row["Sample_Project"] / sample_id
-        if not dry_run:
-            new_path.mkdir(exist_ok=True)
-        row["fastq_dir"] = new_path
-        row["dry_run"] = dry_run
+        if row["pipeline"].lower() == "dragen":
+            path = Path(row["file_path"]).absolute()
+            sample_id = row["SampleID"] if row.get("SampleID") else row["Sample_ID"]
+            new_path = path.parent / row["Sample_Project"] / sample_id
+            if not dry_run:
+                new_path.mkdir(exist_ok=True)
+            row["fastq_dir"] = new_path
+            row["dry_run"] = dry_run
     return excel
 
 
@@ -114,14 +101,6 @@ def move_fast_q(excel: dict, fastq_f: str) -> None:
             )
 
 
-def check_key(dct: dict, k: str, val: str) -> dict:
-    if k in dct.keys():
-        dct[k] = val
-        return dct
-    else:
-        raise KeyError
-
-
 def dragen_cli(
     cmd: dict, excel: dict, postf: str = "", scripts: Optional[dict] = None
 ) -> str:
@@ -135,11 +114,6 @@ def dragen_cli(
     else:
         final_str = f"grun.py -n dragen-{excel['Sample_Name']}{postf} -L logs -q  dragen.q -c 'dragen {default_str}'"  # noqa: E501, B950
     return final_str
-
-
-def infer_pipeline(pipeline: str) -> str:
-    str_list = pipeline.split("_")
-    return str_list[0]
 
 
 def get_flow_cell(path: str) -> str:

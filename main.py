@@ -65,19 +65,16 @@ class HandleFlow(object):
         logging.info("assigning runtype")
         data_file1 = run_type(data_file)
         data_file = sort_list(data_file1)
-        # chosen_pipeline = available_pipeline[pipeline]
-        # flow_context = FlowConstructor(chosen_pipeline)
         for data in data_file:
             if data["pipeline"].lower() == "dragen":
                 if data["pipeline_parameters"].lower() == "rna":
                     pipeline = "dragen_rna"
-                    logging.info("Preparing dragen rna pipeline \x1b[31;1m")
+                    logging.info("Preparing dragen rna pipeline")
                 else:
                     pipeline = "dragen_dna"
-                    logging.info("Preparing dragen dna pipeline \x1b[31;1m")
+                    logging.info("Preparing dragen dna pipeline")
                 chosen_pipeline = available_pipeline[pipeline]
                 flow_context = FlowConstructor(chosen_pipeline)
-                # skip if pipeline is not dragen
                 # attach script to data
                 data["disable_scripts"] = disable_scripts
                 logging.info("Creating dragen commands")

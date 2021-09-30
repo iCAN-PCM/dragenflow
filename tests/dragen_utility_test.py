@@ -1,12 +1,10 @@
 import pytest
 
 from src.utility.dragen_utility import (
-    custom_sort,
     fastq_file,
     file_parse,
     get_flow_cell,
     get_ref,
-    infer_pipeline,
     load_json,
     run_type,
     set_rgism,
@@ -75,12 +73,6 @@ def excel_dict2():
     return data
 
 
-@pytest.mark.parametrize("test_input,expected", [("", 0), ("N1", 0.5), ("T4", 4)])
-def test_custom_sort(test_input, expected):
-    assert custom_sort(test_input) == expected
-    assert type(custom_sort(test_input)) == float
-
-
 def test_get_ref(excel_dict, template_dict):
     ref = get_ref(excel_dict, template_dict)
     assert ref == "test.m_149"
@@ -89,20 +81,6 @@ def test_get_ref(excel_dict, template_dict):
 def test_set_rgism(excel_dict, excel_dict2):
     assert set_rgism(excel_dict) == excel_dict["SampleID"]
     assert set_rgism(excel_dict2) == excel_dict2["Sample_ID"]
-
-
-@pytest.mark.parametrize(
-    "test_input,expected",
-    [
-        ("genome_normal_pipeline", "genome"),
-        ("exome_paired_variant_call", "exome"),
-        ("exome-umi_normal_pipeline", "exome-umi"),
-        ("ican-exome_paired_variant_call", "ican-exome"),
-        ("ican-exome_umi_tumor_variant_call", "ican-exome"),
-    ],
-)
-def test_infer_pipeline(test_input, expected):
-    assert infer_pipeline(test_input) == expected
 
 
 def test_load_json():
